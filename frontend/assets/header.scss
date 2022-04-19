@@ -20,9 +20,10 @@
     a {
       color: $navbarLinkColor;
       text-decoration: none;
-      padding: spacing(0.4) spacing(0.6);
+      padding: spacing(0.8) spacing(1.6);
       border-radius: $navbarLinkBorderRadius;
       transition: background-color 0.5s $transitionInOutCubic;
+      font-size: 1.1em;
       
       &:not(:last-of-type) {
         margin-right: spacing(2);
