@@ -10,6 +10,7 @@ members = [".", "entity", "migration"]
 axum = "0.5.1"
 axum-extra = { version = "0.2.1", features = ["spa"] }
 clap = { version = "3.1.8", features = ["derive"] }
+dotenv = "0.15.0"
 entity = { path = "entity" }
 log = "0.4.16"
 migration = { path = "migration" }
