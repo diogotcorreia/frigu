@@ -13,6 +13,9 @@
    ```
 4. Copy `.env.example` to `.env` and edit `DATABASE_URL` accordingly.
    During development, it's easier to use the MySQL container in `docker-mysql/`.
+
+   If using the development database, you might need to create a database on MySQL (e.g. `DATABASE CREATE frigu;`).
+
 5. Run pending database migrations
    ```bash
    sea-orm-cli migrate up -d ./server/migration
