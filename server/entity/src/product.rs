@@ -7,6 +7,8 @@ use sea_orm::entity::prelude::*;
 pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,
+    pub name: String,
+    pub description: String,
     pub seller: i32,
     pub stock: i32,
     pub price: i32,
@@ -22,11 +24,19 @@ pub enum Relation {
         on_delete = "Restrict"
     )]
     User,
+    #[sea_orm(has_many = "super::transaction::Entity")]
+    Transaction,
 }
 
 impl Related<super::user::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::User.def()
+    }
+}
+
+impl Related<super::transaction::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Transaction.def()
     }
 }
 

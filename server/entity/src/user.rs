@@ -8,6 +8,7 @@ pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,
     pub name: String,
+    #[sea_orm(unique)]
     pub phone_number: String,
     pub hashed_password: String,
 }
@@ -16,11 +17,19 @@ pub struct Model {
 pub enum Relation {
     #[sea_orm(has_many = "super::product::Entity")]
     Product,
+    #[sea_orm(has_many = "super::transaction::Entity")]
+    Transaction,
 }
 
 impl Related<super::product::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::Product.def()
+    }
+}
+
+impl Related<super::transaction::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Transaction.def()
     }
 }
 

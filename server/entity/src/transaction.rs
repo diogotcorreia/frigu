@@ -8,9 +8,10 @@ pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,
     pub buyer: i32,
-    pub seller: i32,
+    pub product: i32,
     pub quantity: i32,
     pub unit_price: i32,
+    pub date: DateTime,
     pub paid_date: Option<DateTime>,
 }
 
@@ -23,15 +24,27 @@ pub enum Relation {
         on_update = "Cascade",
         on_delete = "Restrict"
     )]
-    User2,
+    User,
     #[sea_orm(
-        belongs_to = "super::user::Entity",
-        from = "Column::Seller",
-        to = "super::user::Column::Id",
+        belongs_to = "super::product::Entity",
+        from = "Column::Product",
+        to = "super::product::Column::Id",
         on_update = "Cascade",
         on_delete = "Restrict"
     )]
-    User1,
+    Product,
+}
+
+impl Related<super::user::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::User.def()
+    }
+}
+
+impl Related<super::product::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Product.def()
+    }
 }
 
 impl ActiveModelBehavior for ActiveModel {

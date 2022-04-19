@@ -24,7 +24,12 @@ impl MigrationTrait for Migration {
                             .primary_key(),
                     )
                     .col(ColumnDef::new(User::Name).string().not_null())
-                    .col(ColumnDef::new(User::PhoneNumber).string().not_null())
+                    .col(
+                        ColumnDef::new(User::PhoneNumber)
+                            .string()
+                            .not_null()
+                            .unique_key(),
+                    )
                     .col(ColumnDef::new(User::HashedPassword).string().not_null())
                     .to_owned(),
             )
@@ -42,6 +47,8 @@ impl MigrationTrait for Migration {
                             .auto_increment()
                             .primary_key(),
                     )
+                    .col(ColumnDef::new(Product::Name).string().not_null())
+                    .col(ColumnDef::new(Product::Description).string().not_null())
                     .col(ColumnDef::new(Product::Seller).integer().not_null())
                     .col(ColumnDef::new(Product::Stock).integer().not_null())
                     .col(ColumnDef::new(Product::Price).integer().not_null())
@@ -70,9 +77,10 @@ impl MigrationTrait for Migration {
                             .primary_key(),
                     )
                     .col(ColumnDef::new(Transaction::Buyer).integer().not_null())
-                    .col(ColumnDef::new(Transaction::Seller).integer().not_null())
+                    .col(ColumnDef::new(Transaction::Product).integer().not_null())
                     .col(ColumnDef::new(Transaction::Quantity).integer().not_null())
                     .col(ColumnDef::new(Transaction::UnitPrice).integer().not_null())
+                    .col(ColumnDef::new(Transaction::Date).date_time().not_null())
                     .col(ColumnDef::new(Transaction::PaidDate).date_time())
                     .foreign_key(
                         ForeignKey::create()
@@ -84,9 +92,9 @@ impl MigrationTrait for Migration {
                     )
                     .foreign_key(
                         ForeignKey::create()
-                            .name("fk-transaction-seller")
-                            .from(Transaction::Table, Transaction::Seller)
-                            .to(User::Table, User::Id)
+                            .name("fk-transaction-product")
+                            .from(Transaction::Table, Transaction::Product)
+                            .to(Product::Table, Product::Id)
                             .on_delete(ForeignKeyAction::Restrict)
                             .on_update(ForeignKeyAction::Cascade),
                     )
@@ -121,6 +129,8 @@ pub enum User {
 pub enum Product {
     Table,
     Id,
+    Name,
+    Description,
     Seller,
     Stock,
     Price,
@@ -131,8 +141,9 @@ pub enum Transaction {
     Table,
     Id,
     Buyer,
-    Seller,
+    Product,
     Quantity,
     UnitPrice,
+    Date,
     PaidDate,
 }
