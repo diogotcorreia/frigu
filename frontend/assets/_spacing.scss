@@ -1,0 +1,3 @@
+@function spacing($value) {
+  @return $value * $spacingUnit;
+}

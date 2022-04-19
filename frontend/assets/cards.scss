@@ -1,0 +1,12 @@
+.card {
+  background: $cardBackground;
+  border-radius: $cardBorderRadius;
+  
+  padding: spacing(4) spacing(3);
+  margin: spacing(1) spacing(1);
+  
+  .card-header {
+    font-size: 2em;
+    font-weight: bold;
+  }
+}

@@ -1,0 +1,32 @@
+@import "_variables";
+@import "_spacing";
+
+@import "cards";
+@import "header";
+@import "products";
+
+// Font: Inter
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+
+body {
+  margin: 0;
+  background: $background;
+  color: $textColor;
+  font-family: $font;
+
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  min-height: 100vh;
+  
+  padding: spacing(15) 0;
+}
+
+main {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+
+  width: 100%;
+}

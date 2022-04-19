@@ -1,0 +1,64 @@
+.products-card {
+  width: 90%;
+  max-width: 600px;
+}
+
+.product-list {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  
+  overflow-y: auto;
+}
+
+.product-item {
+  padding: spacing(2) 0;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  
+  &:not(:last-of-type) {
+    border-bottom: 1px solid $productItemSeparatorColor;
+  }
+
+  .product-info {
+    flex-grow: 1;
+
+    .product-info--name {
+      font-weight: bold;
+      font-size: 1.2em;
+      color: $productNameColor;
+    }
+    
+    .product-info--metadata {
+      font-size: 1.1em;
+      color: $productMetadataColor;
+    }
+    
+    .product-info--description {
+      color: $productDescriptionColor;
+    }
+  }
+
+  .product-price {
+    color: $productPriceColor;
+    font-weight: bold;
+    font-size: 1.3em;
+    margin: 0 spacing(1);
+  }
+
+  .product-actions {
+    .product-actions--purchase {
+      box-shadow: none;
+      border: none;
+      background-color: $productBuyButtonColor;
+      color: $productBuyButtonTextColor;
+      padding: spacing(0.5) spacing(0.6);
+      font-weight: bold;
+      font-size: 1.3em;
+      border-radius: $productBuyButtonBorderRadius;
+    }
+  }
+}
