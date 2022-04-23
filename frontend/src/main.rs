@@ -135,6 +135,7 @@ fn product_page() -> Html {
                         </div>
                     </div>
                 </div>
+                {/**/""}
             </main>
         </>
     }
@@ -151,6 +152,13 @@ struct ProductItemProps {
 
 #[function_component(ProductItem)]
 fn product_item(product: &ProductItemProps) -> Html {
+    let dialog_open = use_state(|| false);
+
+    let buy_click_handler = {
+        let dialog_open = dialog_open.clone();
+        Callback::from(move |_| dialog_open.set(!*dialog_open))
+    };
+
     html! {
         <div class="product-item">
             <div class="product-info">
@@ -168,14 +176,69 @@ fn product_item(product: &ProductItemProps) -> Html {
                 {format_display_price(product.price)}
             </div>
             <div class="product-actions">
-                <button class="product-actions--purchase">{"Buy"}</button>
+                <button onclick={buy_click_handler} class="product-actions--purchase">{"Buy"}</button>
             </div>
+            if *dialog_open {
+                <ProductPurchaseDialog ..product.clone() />
+            }
         </div>
     }
 }
 
 fn format_display_price(price: u32) -> String {
     format!("{}.{:02}€", price / 100, price % 100)
+}
+
+#[derive(Clone, Properties, PartialEq)]
+struct DialogProps {
+    children: Children,
+}
+
+#[function_component(Dialog)]
+fn dialog(props: &DialogProps) -> Html {
+    html! {
+        <div class="dialog dialog-backdrop">
+            {props.children.clone()}
+        </div>
+    }
+}
+
+#[function_component(ProductPurchaseDialog)]
+fn product_purchase_dialog(product: &ProductItemProps) -> Html {
+    let quantity = use_state(|| 1);
+
+    let decrease_qnt_handle = {
+        let quantity = quantity.clone();
+        Callback::from(move |_| quantity.set(*quantity - 1))
+    };
+
+    let increase_qnt_handle = {
+        let quantity = quantity.clone();
+        Callback::from(move |_| quantity.set(*quantity + 1))
+    };
+
+    html! {
+        <Dialog>
+            <div class="card">
+                <div class="card-header">
+                    {format!("Purchase {}", product.name.clone())}
+                </div>
+                <div class="card-content">
+                    <div class="product-info--metadata">{format!("By {}", product.seller.clone())}</div>
+                    <div class="product-quantity">
+                        <div class="product-quantity--selector">
+                            <button class="product-quantity--btn" disabled={*quantity <= 1} onclick={decrease_qnt_handle}>{"-"}</button>
+                            <div class="product-quantity--text">{*quantity}</div>
+                            <button class="product-quantity--btn" disabled={*quantity >= product.stock} onclick={increase_qnt_handle}>{"+"}</button>
+                        </div>
+                        <div class="product-quantity--max">
+                            {format!("Max: {}", product.stock)}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </Dialog>
+    }
 }
 
 fn main() {

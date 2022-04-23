@@ -44,3 +44,8 @@ $productPriceColor: $foamColor;
 $productBuyButtonColor: $loveColor;
 $productBuyButtonTextColor: $baseColor;
 $productBuyButtonBorderRadius: $borderRadius;
+$productQuantityButtonsBackground: $highlightMedColor;
+$productQuantityButtonsBorderRadius: $borderRadius;
+
+// Dialog
+$dialogBackdropColor: transparentize($overlayColor, 0.4);

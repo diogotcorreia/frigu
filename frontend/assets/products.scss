@@ -63,3 +63,50 @@
     }
   }
 }
+
+.product-quantity {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  
+  margin-top: spacing(1);
+  
+  .product-quantity--selector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .product-quantity--btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    background: $productQuantityButtonsBackground;
+    font-size: 3em;
+    font-weight: bold;
+    font-family: monospace;
+    border-radius: $productQuantityButtonsBorderRadius;
+    width: 1.1em;
+    height: 1.1em;
+    
+    color: $textColor;
+    
+    &:disabled {
+      opacity: 0.5;
+    }
+  }
+  
+  .product-quantity--text {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 2em;
+    font-weight: bold;
+    min-width: 2ch;
+    margin: 0 spacing(1);
+  }
+}
