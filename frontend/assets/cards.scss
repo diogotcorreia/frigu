@@ -9,4 +9,10 @@
     font-size: 2em;
     font-weight: bold;
   }
+  
+  .card-actions {
+    margin-top: spacing(4);
+    
+    @include flex($justifyContent: flex-end);
+  }
 }

@@ -1,7 +1,8 @@
 @import "_variables";
-@import "_spacing";
+@import "_utils";
 
 @import "cards";
+@import "buttons";
 @import "dialog";
 @import "header";
 @import "products";
@@ -15,19 +16,15 @@ body {
   color: $textColor;
   font-family: $font;
 
-  display: flex;
-  align-items: stretch;
-  justify-content: stretch;
+  @include flex($alignItems: stretch, $justifyContent: stretch);
   min-height: 100vh;
   
   padding: spacing(15) 0;
 }
 
 main {
-  display: flex;
+  @include flex($alignItems: flex-start);
   flex-direction: row;
-  align-items: flex-start;
-  justify-content: center;
 
   width: 100%;
 }

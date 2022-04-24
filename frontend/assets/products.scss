@@ -4,10 +4,8 @@
 }
 
 .product-list {
-  display: flex;
+  @include flex($alignItems: stretch, $justifyContent: flex-start);
   flex-direction: column;
-  justify-content: flex-start;
-  align-items: stretch;
   
   overflow-y: auto;
 }
@@ -48,42 +46,39 @@
     font-size: 1.3em;
     margin: 0 spacing(2);
   }
+}
 
-  .product-actions {
-    .product-actions--purchase {
-      box-shadow: none;
-      border: none;
-      background-color: $productBuyButtonColor;
-      color: $productBuyButtonTextColor;
-      padding: spacing(0.5) spacing(0.6);
-      font-weight: bold;
-      font-size: 1.3em;
-      border-radius: $productBuyButtonBorderRadius;
-      text-transform: uppercase;
-    }
+.product-actions {
+  .product-actions--purchase {
+    background-color: $productBuyButtonColor;
+    color: $productBuyButtonTextColor;
+  }
+  
+  .product-actions--cancel {
+    background-color: $productCancelButtonColor;
+    color: $productCancelButtonTextColor;
+    margin-right: spacing(1);
+  }
+  
+  .product-actions--done {
+    background-color: $productDoneButtonColor;
+    color: $productDoneButtonTextColor;
   }
 }
 
 .product-quantity {
-  display: flex;
+  @include flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
   
-  margin-top: spacing(1);
+  margin-top: spacing(3);
   
   .product-quantity--selector {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    @include flex;
   }
   
   .product-quantity--btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    @include flex;
 
-    border: none;
     background: $productQuantityButtonsBackground;
     font-size: 3em;
     font-weight: bold;
@@ -100,13 +95,15 @@
   }
   
   .product-quantity--text {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    @include flex;
 
     font-size: 2em;
     font-weight: bold;
     min-width: 2ch;
-    margin: 0 spacing(1);
+    margin: 0 spacing(3);
+  }
+  
+  .product-quantity--stock {
+    color: $subtleColor;
   }
 }

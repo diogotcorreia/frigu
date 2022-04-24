@@ -117,21 +117,21 @@ fn product_page() -> Html {
                     </div>
                     <div class="card-content">
                         <div class="product-list">
-                            <ProductItem name="Napolitanas" description="Cenas com chocolate. Yummy!" seller="Rafael Girão" stock={20} price={50} />
-                            <ProductItem name="Napolitanas" description="Cenas com chocolate. Yummy!" seller="Rafael Girão" stock={20} price={50} />
-                            <ProductItem name="Napolitanas" description="Cenas com chocolate. Yummy!" seller="Rafael Girão" stock={20} price={50} />
-                            <ProductItem name="Napolitanas" description="Cenas com chocolate. Yummy!" seller="Rafael Girão" stock={20} price={50} />
-                            <ProductItem name="Napolitanas" description="Cenas com chocolate. Yummy!" seller="Rafael Girão" stock={20} price={50} />
-                            <ProductItem name="Napolitanas" description="Cenas com chocolate. Yummy!" seller="Rafael Girão" stock={20} price={50} />
-                            <ProductItem name="Napolitanas" description="Cenas com chocolate. Yummy!" seller="Rafael Girão" stock={20} price={50} />
-                            <ProductItem name="Napolitanas" description="Cenas com chocolate. Yummy!" seller="Rafael Girão" stock={20} price={50} />
-                            <ProductItem name="Napolitanas" description="Cenas com chocolate. Yummy!" seller="Rafael Girão" stock={20} price={50} />
-                            <ProductItem name="Napolitanas" description="Cenas com chocolate. Yummy!" seller="Rafael Girão" stock={20} price={50} />
-                            <ProductItem name="Napolitanas" description="Cenas com chocolate. Yummy!" seller="Rafael Girão" stock={20} price={50} />
-                            <ProductItem name="Napolitanas" description="Cenas com chocolate. Yummy!" seller="Rafael Girão" stock={20} price={50} />
-                            <ProductItem name="Napolitanas" description="Cenas com chocolate. Yummy!" seller="Rafael Girão" stock={20} price={50} />
-                            <ProductItem name="Napolitanas" description="Cenas com chocolate. Yummy!" seller="Rafael Girão" stock={20} price={50} />
-                            <ProductItem name="Napolitanas" description="Cenas com chocolate. Yummy!" seller="Rafael Girão" stock={20} price={50} />
+                            <ProductItem name="Napolitanas" description="Cenas com chocolate. Yummy!" seller="Rafael Girão" stock={20} price={10} />
+                            <ProductItem name="Napolitanas" description="Cenas com chocolate. Yummy!" seller="Rafael Girão" stock={20} price={10} />
+                            <ProductItem name="Napolitanas" description="Cenas com chocolate. Yummy!" seller="Rafael Girão" stock={20} price={10} />
+                            <ProductItem name="Napolitanas" description="Cenas com chocolate. Yummy!" seller="Rafael Girão" stock={20} price={10} />
+                            <ProductItem name="Napolitanas" description="Cenas com chocolate. Yummy!" seller="Rafael Girão" stock={20} price={10} />
+                            <ProductItem name="Napolitanas" description="Cenas com chocolate. Yummy!" seller="Rafael Girão" stock={20} price={10} />
+                            <ProductItem name="Napolitanas" description="Cenas com chocolate. Yummy!" seller="Rafael Girão" stock={20} price={10} />
+                            <ProductItem name="Napolitanas" description="Cenas com chocolate. Yummy!" seller="Rafael Girão" stock={20} price={10} />
+                            <ProductItem name="Napolitanas" description="Cenas com chocolate. Yummy!" seller="Rafael Girão" stock={20} price={10} />
+                            <ProductItem name="Napolitanas" description="Cenas com chocolate. Yummy!" seller="Rafael Girão" stock={20} price={10} />
+                            <ProductItem name="Napolitanas" description="Cenas com chocolate. Yummy!" seller="Rafael Girão" stock={20} price={10} />
+                            <ProductItem name="Napolitanas" description="Cenas com chocolate. Yummy!" seller="Rafael Girão" stock={20} price={10} />
+                            <ProductItem name="Napolitanas" description="Cenas com chocolate. Yummy!" seller="Rafael Girão" stock={20} price={10} />
+                            <ProductItem name="Napolitanas" description="Cenas com chocolate. Yummy!" seller="Rafael Girão" stock={20} price={10} />
+                            <ProductItem name="Napolitanas" description="Cenas com chocolate. Yummy!" seller="Rafael Girão" stock={20} price={10} />
                         </div>
                     </div>
                 </div>
@@ -146,17 +146,31 @@ struct ProductItemProps {
     name: String,
     description: String,
     seller: String,
-    stock: i32,
+    stock: u32,
     price: u32,
 }
 
 #[function_component(ProductItem)]
 fn product_item(product: &ProductItemProps) -> Html {
-    let dialog_open = use_state(|| false);
+    let flow_state = use_state(|| PurchaseFlow::None);
 
     let buy_click_handler = {
-        let dialog_open = dialog_open.clone();
-        Callback::from(move |_| dialog_open.set(!*dialog_open))
+        let flow_state = flow_state.clone();
+        Callback::from(move |_| flow_state.set(PurchaseFlow::SelectingQuantity))
+    };
+
+    let dialog_close_handler = {
+        let flow_state = flow_state.clone();
+        Callback::from(move |_| flow_state.set(PurchaseFlow::None))
+    };
+
+    let dialog_buy_handler = {
+        let flow_state = flow_state.clone();
+        Callback::from(move |amount: u32| {
+            flow_state.set(PurchaseFlow::Loading);
+            // TODO send request to backend
+            flow_state.set(PurchaseFlow::Complete);
+        })
     };
 
     html! {
@@ -176,10 +190,27 @@ fn product_item(product: &ProductItemProps) -> Html {
                 {format_display_price(product.price)}
             </div>
             <div class="product-actions">
-                <button onclick={buy_click_handler} class="product-actions--purchase">{"Buy"}</button>
+                <button onclick={buy_click_handler} class="btn product-actions--purchase">{"Buy"}</button>
             </div>
-            if *dialog_open {
-                <ProductPurchaseDialog ..product.clone() />
+            {
+            match *flow_state {
+                PurchaseFlow::SelectingQuantity => html! {
+                    <ProductPurchaseDialog product={product.clone()} on_close={dialog_close_handler} on_buy={dialog_buy_handler} />
+                },
+                PurchaseFlow::Loading => html! {
+                    <Dialog>
+                        <div class="card">
+                            <div class="card-header">
+                                {"Loading..."}
+                            </div>
+                        </div>
+                    </Dialog>
+                },
+                PurchaseFlow::Complete => html! {
+                    <ProductPurchaseCompleteDialog on_close={dialog_close_handler} />
+                },
+                _ => html! {},
+            }
             }
         </div>
     }
@@ -203,9 +234,16 @@ fn dialog(props: &DialogProps) -> Html {
     }
 }
 
+#[derive(Clone, Properties, PartialEq)]
+struct ProductPurchaseDialogProps {
+    product: ProductItemProps, /* TODO replace with Product DTO in the future */
+    on_close: Callback<MouseEvent>,
+    on_buy: Callback<u32>,
+}
+
 #[function_component(ProductPurchaseDialog)]
-fn product_purchase_dialog(product: &ProductItemProps) -> Html {
-    let quantity = use_state(|| 1);
+fn product_purchase_dialog(props: &ProductPurchaseDialogProps) -> Html {
+    let quantity: UseStateHandle<u32> = use_state(|| 1);
 
     let decrease_qnt_handle = {
         let quantity = quantity.clone();
@@ -217,6 +255,14 @@ fn product_purchase_dialog(product: &ProductItemProps) -> Html {
         Callback::from(move |_| quantity.set(*quantity + 1))
     };
 
+    let on_buy_handle = {
+        let quantity = quantity.clone();
+        let on_buy = props.on_buy.clone();
+        Callback::from(move |_| Callback::emit(&on_buy, *quantity))
+    };
+
+    let product = &props.product;
+
     html! {
         <Dialog>
             <div class="card">
@@ -227,14 +273,49 @@ fn product_purchase_dialog(product: &ProductItemProps) -> Html {
                     <div class="product-info--metadata">{format!("By {}", product.seller.clone())}</div>
                     <div class="product-quantity">
                         <div class="product-quantity--selector">
-                            <button class="product-quantity--btn" disabled={*quantity <= 1} onclick={decrease_qnt_handle}>{"-"}</button>
-                            <div class="product-quantity--text">{*quantity}</div>
-                            <button class="product-quantity--btn" disabled={*quantity >= product.stock} onclick={increase_qnt_handle}>{"+"}</button>
-                        </div>
-                        <div class="product-quantity--max">
-                            {format!("Max: {}", product.stock)}
+                            <button class="btn product-quantity--btn" disabled={*quantity <= 1} onclick={decrease_qnt_handle}>{"-"}</button>
+                            <div class="product-quantity--text">{*quantity}<span class="product-quantity--stock">{format!("/{}", product.stock)}</span></div>
+                            <button class="btn product-quantity--btn" disabled={*quantity >= product.stock} onclick={increase_qnt_handle}>{"+"}</button>
                         </div>
                     </div>
+                </div>
+                <div class="card-actions product-actions">
+                    <button onclick={&props.on_close} class="btn product-actions--cancel">
+                        {"Cancel"}
+                    </button>
+                    <button onclick={on_buy_handle} class="btn product-actions--purchase">
+                        {format!("Buy for {}", format_display_price(product.price * *quantity))}
+                    </button>
+                </div>
+            </div>
+        </Dialog>
+    }
+}
+
+enum PurchaseFlow {
+    None,
+    SelectingQuantity,
+    Loading,
+    Complete,
+}
+
+#[derive(Clone, Properties, PartialEq)]
+struct ProductPurchaseCompleteDialogProps {
+    on_close: Callback<MouseEvent>,
+}
+
+#[function_component(ProductPurchaseCompleteDialog)]
+fn product_purchase_complete_dialog(props: &ProductPurchaseCompleteDialogProps) -> Html {
+    html! {
+        <Dialog>
+            <div class="card">
+                <div class="card-header">
+                    {"Purchase complete!"}
+                </div>
+                <div class="card-actions product-actions">
+                    <button onclick={&props.on_close} class="btn product-actions--done">
+                        {"Done"}
+                    </button>
                 </div>
             </div>
         </Dialog>

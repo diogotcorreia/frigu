@@ -1,7 +1,5 @@
 .dialog {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex;
   z-index: 100;
 
   &.dialog-backdrop {
