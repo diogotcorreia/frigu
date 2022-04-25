@@ -46,7 +46,6 @@ pub fn product_page() -> Html {
                         </div>
                     </div>
                 </div>
-                {/**/""}
             </main>
         </>
     }

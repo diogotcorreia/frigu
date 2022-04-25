@@ -61,24 +61,24 @@ pub fn product_item(product: &ProductItemProps) -> Html {
                 <button onclick={buy_click_handler} class="btn product-actions--purchase">{"Buy"}</button>
             </div>
             {
-            match *flow_state {
-                PurchaseFlow::SelectingQuantity => html! {
-                    <ProductPurchaseDialog product={product.clone()} on_close={dialog_close_handler} on_buy={dialog_buy_handler} />
-                },
-                PurchaseFlow::Loading => html! {
-                    <Dialog>
-                        <div class="card">
-                            <div class="card-header">
-                                {"Loading..."}
+                match *flow_state {
+                    PurchaseFlow::SelectingQuantity => html! {
+                        <ProductPurchaseDialog product={product.clone()} on_close={dialog_close_handler} on_buy={dialog_buy_handler} />
+                    },
+                    PurchaseFlow::Loading => html! {
+                        <Dialog>
+                            <div class="card">
+                                <div class="card-header">
+                                    {"Loading..."}
+                                </div>
                             </div>
-                        </div>
-                    </Dialog>
-                },
-                PurchaseFlow::Complete => html! {
-                    <ProductPurchaseCompleteDialog on_close={dialog_close_handler} />
-                },
-                _ => html! {},
-            }
+                        </Dialog>
+                    },
+                    PurchaseFlow::Complete => html! {
+                        <ProductPurchaseCompleteDialog on_close={dialog_close_handler} />
+                    },
+                    _ => html! {},
+                }
             }
         </div>
     }
