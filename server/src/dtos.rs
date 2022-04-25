@@ -4,6 +4,8 @@ use sea_orm::prelude::*;
 use sea_orm::DatabaseConnection;
 use serde::{Deserialize, Serialize};
 
+use crate::errors::AppError;
+
 #[derive(Serialize, Deserialize)]
 pub struct ProductDto {
     pub(crate) id: Option<u32>,
@@ -16,13 +18,15 @@ pub struct ProductDto {
 }
 
 impl ProductDto {
-    pub(crate) async fn from_entity(entity: product::Model, conn: &DatabaseConnection) -> Self {
+    pub(crate) async fn from_entity(
+        entity: product::Model,
+        conn: &DatabaseConnection,
+    ) -> Result<Self, AppError> {
         let seller = user::Entity::find_by_id(entity.seller)
             .one(conn)
-            .await
-            .expect("TODO: handle DbErr")
+            .await?
             .expect("seller of product must exist");
-        Self {
+        Ok(Self {
             id: Some(entity.id),
             seller_id: Some(entity.seller),
             seller_name: Some(seller.name),
@@ -30,6 +34,12 @@ impl ProductDto {
             price: entity.price,
             name: entity.name,
             description: entity.description,
-        }
+        })
     }
+}
+
+#[derive(Deserialize)]
+pub struct LoginDto {
+    pub(crate) id: u32,
+    pub(crate) password: String,
 }

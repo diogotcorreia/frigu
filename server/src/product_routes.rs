@@ -1,4 +1,5 @@
 use axum::{extract, Extension, Json};
+use axum_extra::extract::CookieJar;
 use entity::{
     product::{self, Entity as Product},
     sea_orm,
@@ -10,22 +11,23 @@ use crate::errors::AppError;
 
 pub(crate) async fn list(
     Extension(ref conn): Extension<DatabaseConnection>,
-) -> Json<Vec<JsonValue>> {
-    Json(
+) -> Result<Json<Vec<JsonValue>>, AppError> {
+    Ok(Json(
         Product::find()
             .filter(product::Column::Stock.gt(0))
             .order_by_desc(product::Column::Stock)
             .into_json()
             .all(conn)
-            .await
-            .unwrap(),
-    )
+            .await?,
+    ))
 }
 
 pub(crate) async fn insert(
     extract::Json(product_dto): extract::Json<ProductDto>,
     Extension(ref conn): Extension<DatabaseConnection>,
+    jar: CookieJar,
 ) -> Result<Json<ProductDto>, AppError> {
+    let seller_id = crate::jwt_helpers::get_login(&jar)?;
     // validate stock
     let stock = product_dto.stock;
     if stock == 0 {
@@ -50,18 +52,18 @@ pub(crate) async fn insert(
             None
         }
     });
-    // TODO: get seller id from cookies
     let product = product::ActiveModel {
-        stock: Set(stock),
-        price: Set(price),
         name: Set(name.to_string()),
         description: Set(description),
+        seller: Set(seller_id),
+        stock: Set(stock),
+        price: Set(price),
         ..Default::default()
     };
 
-    let product = product.insert(conn).await.expect("could not insert product"); // TODO handle error
+    let product = product.insert(conn).await?;
 
-    let new_product_dto = ProductDto::from_entity(product, conn).await;
+    let new_product_dto = ProductDto::from_entity(product, conn).await?;
 
     Ok(Json(new_product_dto))
 }

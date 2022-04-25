@@ -20,7 +20,9 @@ use tower_http::trace::TraceLayer;
 
 mod dtos;
 mod errors;
+mod jwt_helpers;
 mod product_routes;
+mod user_routes;
 
 // Setup the command line interface with clap.
 #[derive(Parser, Debug)]
@@ -64,6 +66,7 @@ async fn main() {
 
     let api_routes = Router::new()
         .route("/hello", get(hello))
+        .route("/login", post(user_routes::login))
         .route("/products", get(product_routes::list))
         .route("/product", post(product_routes::insert));
 
