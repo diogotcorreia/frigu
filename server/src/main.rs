@@ -1,13 +1,16 @@
 use axum::body::{boxed, Body};
-use axum::extract::Extension;
+use axum::extract::{self, Extension};
 use axum::http::{Response, StatusCode};
-use axum::{response::IntoResponse, routing::get, Json, Router};
+use axum::{
+    response::IntoResponse,
+    routing::{get, post},
+    Json, Router,
+};
 use clap::Parser;
-use entity::sea_orm;
-use entity::{product, user};
+use entity::{product, sea_orm};
 use migration::{Migrator, MigratorTrait};
 use product::Entity as Product;
-use sea_orm::{prelude::*, Database, JsonValue, QueryOrder};
+use sea_orm::{prelude::*, Database, JsonValue, QueryOrder, Set};
 use std::env;
 use std::net::{IpAddr, Ipv6Addr, SocketAddr};
 use std::path::PathBuf;
@@ -17,7 +20,11 @@ use tower::{ServiceBuilder, ServiceExt};
 use tower_http::add_extension::AddExtensionLayer;
 use tower_http::services::ServeDir;
 use tower_http::trace::TraceLayer;
-use user::Entity as User;
+
+mod dtos;
+use dtos::ProductDto;
+mod errors;
+use errors::AppError;
 
 // Setup the command line interface with clap.
 #[derive(Parser, Debug)]
@@ -59,9 +66,13 @@ async fn main() {
         .expect("Database connection failed");
     Migrator::up(&conn, None).await.unwrap();
 
+    let api_routes = Router::new()
+        .route("/hello", get(hello))
+        .route("/products", get(list_products))
+        .route("/product", post(insert_product));
+
     let app = Router::new()
-        .route("/api/hello", get(hello))
-        .route("/api/products", get(list_products))
+        .nest("/api", api_routes)
         .fallback(get(|req| async move {
             match ServeDir::new(&opt.static_dir).oneshot(req).await {
                 Ok(res) => match res.status() {
@@ -123,4 +134,48 @@ async fn list_products(Extension(ref conn): Extension<DatabaseConnection>) -> Js
             .await
             .unwrap(),
     )
+}
+
+async fn insert_product(
+    extract::Json(product_dto): extract::Json<ProductDto>,
+    Extension(ref conn): Extension<DatabaseConnection>,
+) -> Result<Json<ProductDto>, AppError> {
+    // validate stock
+    let stock = product_dto.stock;
+    if stock == 0 {
+        return Err(AppError::BadInput("stock must be greater than 0"));
+    }
+    // validate price
+    let price = product_dto.price;
+    if price == 0 {
+        return Err(AppError::BadInput("price must be greater than 0"));
+    }
+    // validate name
+    let name = product_dto.name.trim();
+    if name.len() == 0 {
+        return Err(AppError::BadInput("name can't be empty"));
+    }
+    // validate description
+    let description = product_dto.description.and_then(|s| {
+        let trimmed = s.trim();
+        if trimmed.len() > 0 {
+            Some(trimmed.to_string())
+        } else {
+            None
+        }
+    });
+    // TODO: get seller id from cookies
+    let product = product::ActiveModel {
+        stock: Set(stock),
+        price: Set(price),
+        name: Set(name.to_string()),
+        description: Set(description),
+        ..Default::default()
+    };
+
+    let product = product.insert(conn).await.expect("could not insert post"); // TODO
+
+    let new_product_dto = ProductDto::from_entity(product, conn).await;
+
+    Ok(Json(new_product_dto))
 }

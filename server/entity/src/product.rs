@@ -6,12 +6,12 @@ use sea_orm::entity::prelude::*;
 #[sea_orm(table_name = "product")]
 pub struct Model {
     #[sea_orm(primary_key)]
-    pub id: i32,
+    pub id: u32,
     pub name: String,
-    pub description: String,
-    pub seller: i32,
-    pub stock: i32,
-    pub price: i32,
+    pub description: Option<String>,
+    pub seller: u32,
+    pub stock: u32,
+    pub price: u32,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
