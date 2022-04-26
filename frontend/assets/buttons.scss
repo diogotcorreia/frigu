@@ -9,4 +9,9 @@
   border-radius: $borderRadius;
   text-transform: uppercase;
   cursor: pointer;
+  
+  &.btn--full-width {
+    width: 100%;
+    box-sizing: border-box;
+  }
 }

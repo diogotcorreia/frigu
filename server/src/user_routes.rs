@@ -12,12 +12,13 @@ pub(crate) async fn login(
     Extension(ref conn): Extension<DatabaseConnection>,
     jar: CookieJar,
 ) -> Result<CookieJar, AppError> {
-    let user = user::Entity::find_by_id(login_dto.id)
+    let user = user::Entity::find()
+        .filter(user::Column::PhoneNumber.contains(&login_dto.phone))
         .one(conn)
         .await?
         .ok_or(AppError::NoSuchUser)?;
 
-    let password = login_dto.password;
+    let password = dbg!(login_dto.password);
 
     let hashed_password = user.hashed_password;
     let password_hash =

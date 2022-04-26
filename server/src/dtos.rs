@@ -40,6 +40,6 @@ impl ProductDto {
 
 #[derive(Deserialize)]
 pub struct LoginDto {
-    pub(crate) id: u32,
+    pub(crate) phone: String,
     pub(crate) password: String,
 }

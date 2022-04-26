@@ -23,9 +23,31 @@ pub async fn list_products() -> Result<Vec<Product>, ApiError> {
     if resp.ok() {
         // TODO handle errors
         let products: Vec<Product> = resp.json().await.unwrap();
-        return Ok(products);
+        Ok(products)
     } else {
         // TODO handle errors
+        Err(ApiError::ConnectionError)
+    }
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct LoginPayload {
+    pub phone: String,
+    pub password: String,
+}
+
+pub async fn login(credentials: &LoginPayload) -> Result<(), ApiError> {
+    let resp = Request::post("/api/login")
+        .json(credentials)
+        .expect("payload must be serializable to json")
+        .send()
+        .await
+        .unwrap();
+
+    if resp.ok() {
+        // TODO handle errors and set cookie
+        Ok(())
+    } else {
         Err(ApiError::ConnectionError)
     }
 }

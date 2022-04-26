@@ -1,0 +1,29 @@
+.form {
+  &.form-margin-top {
+    margin-top: spacing(2);
+  }
+
+  &.form-vertical {
+    @include flex($alignItems: flex-start);
+    flex-direction: column;
+  }
+
+  label {
+    font-size: 0.9em;
+  }
+
+  input {
+    width: 100%;
+    box-sizing: border-box;
+
+    border: 1px solid $formInputBorderColor;
+    border-radius: $formInputBorderRadius;
+    background-color: $formInputBackgroundColor;
+    color: $formInputTextColor;
+
+    padding: spacing(1) spacing(2);
+
+    margin-top: spacing(1);
+    margin-bottom: spacing(4);
+  }
+}
