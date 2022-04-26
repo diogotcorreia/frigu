@@ -2,17 +2,20 @@ use yew::prelude::*;
 use yew_router::prelude::*;
 
 mod components;
+mod hooks;
 mod pages;
 
 mod api;
 mod utils;
 
-use pages::product_page::ProductPage;
+use pages::{login_page::LoginPage, product_page::ProductPage};
 
 #[derive(Clone, Routable, PartialEq)]
 enum Route {
     #[at("/")]
     Home,
+    #[at("/login")]
+    Login,
     #[at("/products")]
     ProductPage,
 }
@@ -21,6 +24,7 @@ fn switch(routes: &Route) -> Html {
     match routes {
         /* TODO redirect to login page if logged out */
         Route::Home => html! { <Redirect<Route> to={Route::ProductPage} /> },
+        Route::Login => html! { <LoginPage /> },
         Route::ProductPage => html! { <ProductPage /> },
     }
 }

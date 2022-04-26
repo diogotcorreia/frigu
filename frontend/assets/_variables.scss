@@ -24,6 +24,8 @@ $transitionInOutCubic: cubic-bezier(0.65, 0.05, 0.36, 1);
 $background: $baseColor;
 $textColor: $textColor;
 
+$linkColor: $foamColor;
+
 // Navbar settings
 $navbarBackground: $surfaceColor;
 $navbarLinkColor: $subtleColor;
@@ -52,3 +54,9 @@ $productQuantityButtonsBorderRadius: $borderRadius;
 
 // Dialog
 $dialogBackdropColor: transparentize($overlayColor, 0.4);
+
+// Forms
+$formInputBorderColor: $subtleColor;
+$formInputBorderRadius: $borderRadius;
+$formInputBackgroundColor: $baseColor;
+$formInputTextColor: $textColor;

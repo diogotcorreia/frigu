@@ -23,9 +23,60 @@ pub async fn list_products() -> Result<Vec<Product>, ApiError> {
     if resp.ok() {
         // TODO handle errors
         let products: Vec<Product> = resp.json().await.unwrap();
-        return Ok(products);
+        Ok(products)
     } else {
         // TODO handle errors
+        Err(ApiError::ConnectionError)
+    }
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct LoginPayload {
+    pub phone: String,
+    pub password: String,
+}
+
+pub async fn login(credentials: &LoginPayload) -> Result<(), ApiError> {
+    let resp = Request::post("/api/login")
+        .json(credentials)
+        .expect("payload must be serializable to json")
+        .send()
+        .await
+        .unwrap();
+
+    if resp.ok() {
+        // TODO handle errors
+        Ok(())
+    } else {
+        Err(ApiError::ConnectionError)
+    }
+}
+
+#[derive(Deserialize, Clone)]
+pub struct User {
+    pub id: u32,
+    pub name: String,
+
+    pub phone_number: String,
+}
+
+pub async fn user_info() -> Result<User, ApiError> {
+    let resp = Request::get("/api/user/info").send().await.unwrap();
+
+    if resp.ok() {
+        // TODO handle errors
+        Ok(resp.json().await.unwrap())
+    } else {
+        Err(ApiError::ConnectionError)
+    }
+}
+
+pub async fn logout() -> Result<(), ApiError> {
+    let resp = Request::get("/api/logout").send().await.unwrap();
+
+    if resp.ok() {
+        Ok(())
+    } else {
         Err(ApiError::ConnectionError)
     }
 }
