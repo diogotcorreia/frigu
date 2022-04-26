@@ -43,3 +43,20 @@ pub struct LoginDto {
     pub(crate) phone: String,
     pub(crate) password: String,
 }
+
+#[derive(Serialize)]
+pub struct UserDto {
+    pub(crate) id: u32,
+    pub(crate) name: String,
+    pub(crate) phone_number: String,
+}
+
+impl UserDto {
+    pub(crate) fn from_entity(entity: user::Model) -> Result<Self, AppError> {
+        Ok(Self {
+            id: entity.id,
+            name: entity.name,
+            phone_number: entity.phone_number,
+        })
+    }
+}

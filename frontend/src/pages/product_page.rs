@@ -3,7 +3,7 @@ use yew::prelude::*;
 
 use crate::{
     api,
-    components::{navbar::Navbar, product::product_item::ProductItem},
+    components::{footer::Footer, navbar::Navbar, product::product_item::ProductItem},
 };
 
 #[function_component(ProductPage)]
@@ -64,6 +64,7 @@ pub fn product_page() -> Html {
                     </div>
                 </div>
             </main>
+            <Footer />
         </>
     }
 }

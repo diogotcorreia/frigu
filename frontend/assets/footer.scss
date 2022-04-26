@@ -1,0 +1,5 @@
+.footer {
+  @include flex;
+
+  margin: spacing(4) spacing(2);
+}

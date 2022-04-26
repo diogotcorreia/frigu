@@ -65,8 +65,9 @@ async fn main() {
     Migrator::up(&conn, None).await.unwrap();
 
     let api_routes = Router::new()
-        .route("/hello", get(hello))
         .route("/login", post(user_routes::login))
+        .route("/user/info", get(user_routes::user_info))
+        .route("/logout", get(user_routes::logout))
         .route("/products", get(product_routes::list))
         .route("/product", post(product_routes::insert));
 
@@ -117,8 +118,4 @@ async fn main() {
         .serve(app.into_make_service())
         .await
         .expect("Unable to start server");
-}
-
-async fn hello() -> impl IntoResponse {
-    "hello from server!"
 }

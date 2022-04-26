@@ -2,6 +2,7 @@ use yew::prelude::*;
 use yew_router::prelude::*;
 
 mod components;
+mod hooks;
 mod pages;
 
 mod api;

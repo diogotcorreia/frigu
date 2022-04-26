@@ -4,6 +4,7 @@
 @import "cards";
 @import "buttons";
 @import "dialog";
+@import "footer";
 @import "forms";
 @import "header";
 @import "products";
@@ -16,15 +17,21 @@ body {
   background: $background;
   color: $textColor;
   font-family: $font;
+  min-height: 100vh;
 
   @include flex($alignItems: stretch, $justifyContent: stretch);
-  
-  padding: spacing(15) 0;
+  flex-direction: column;
 }
 
 main {
   @include flex($alignItems: flex-start);
+  flex-grow: 1;
   flex-direction: row;
 
   width: 100%;
+  margin: spacing(15) 0;
+}
+
+a {
+  color: $linkColor;
 }

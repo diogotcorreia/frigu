@@ -45,7 +45,36 @@ pub async fn login(credentials: &LoginPayload) -> Result<(), ApiError> {
         .unwrap();
 
     if resp.ok() {
-        // TODO handle errors and set cookie
+        // TODO handle errors
+        Ok(())
+    } else {
+        Err(ApiError::ConnectionError)
+    }
+}
+
+#[derive(Deserialize, Clone)]
+pub struct User {
+    pub id: u32,
+    pub name: String,
+
+    pub phone_number: String,
+}
+
+pub async fn user_info() -> Result<User, ApiError> {
+    let resp = Request::get("/api/user/info").send().await.unwrap();
+
+    if resp.ok() {
+        // TODO handle errors
+        Ok(resp.json().await.unwrap())
+    } else {
+        Err(ApiError::ConnectionError)
+    }
+}
+
+pub async fn logout() -> Result<(), ApiError> {
+    let resp = Request::get("/api/logout").send().await.unwrap();
+
+    if resp.ok() {
         Ok(())
     } else {
         Err(ApiError::ConnectionError)

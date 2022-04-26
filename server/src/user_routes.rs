@@ -1,11 +1,14 @@
 use argon2::{Argon2, PasswordHash, PasswordVerifier};
-use axum::{extract, Extension};
-use axum_extra::extract::cookie::CookieJar;
+use axum::{extract, Extension, Json};
+use axum_extra::extract::cookie::{Cookie, CookieJar};
 use sea_orm::{prelude::*, DatabaseConnection};
 
 use entity::user;
 
-use crate::{dtos::LoginDto, errors::AppError};
+use crate::{
+    dtos::{LoginDto, UserDto},
+    errors::AppError,
+};
 
 pub(crate) async fn login(
     extract::Json(login_dto): extract::Json<LoginDto>,
@@ -27,4 +30,22 @@ pub(crate) async fn login(
 
     let user_cookie = crate::jwt_helpers::new_cookie(user.id)?;
     Ok(jar.add(user_cookie))
+}
+
+pub(crate) async fn user_info(
+    Extension(ref conn): Extension<DatabaseConnection>,
+    jar: CookieJar,
+) -> Result<Json<UserDto>, AppError> {
+    let user_id = crate::jwt_helpers::get_login(&jar)?;
+
+    let user = user::Entity::find_by_id(user_id)
+        .one(conn)
+        .await?
+        .ok_or(AppError::NoSuchUser)?;
+
+    Ok(Json(UserDto::from_entity(user)?))
+}
+
+pub(crate) async fn logout(jar: CookieJar) -> Result<CookieJar, AppError> {
+    Ok(jar.remove(Cookie::named("jwt")))
 }
