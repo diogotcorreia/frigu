@@ -1,13 +1,10 @@
 use yew::prelude::*;
 
-use crate::{
-    components::{dialog::Dialog, product::product_item::ProductItemProps},
-    utils,
-};
+use crate::{api, components::dialog::Dialog, utils};
 
 #[derive(Clone, Properties, PartialEq)]
 pub struct ProductPurchaseDialogProps {
-    pub product: ProductItemProps, /* TODO replace with Product DTO in the future */
+    pub product: api::Product,
     pub on_close: Callback<MouseEvent>,
     pub on_buy: Callback<u32>,
 }
@@ -41,7 +38,7 @@ pub fn product_purchase_dialog(props: &ProductPurchaseDialogProps) -> Html {
                     {format!("Purchase {}", product.name.clone())}
                 </div>
                 <div class="card-content">
-                    <div class="product-info--metadata">{format!("By {}", product.seller.clone())}</div>
+                    <div class="product-info--metadata">{format!("By {}", "Rafael Girão" /* TODO */)}</div>
                     <div class="product-quantity">
                         <div class="product-quantity--selector">
                             <button class="btn product-quantity--btn" disabled={*quantity <= 1} onclick={decrease_qnt_handle}>{"-"}</button>

@@ -7,19 +7,15 @@ use crate::components::{
         product_purchase_dialog::ProductPurchaseDialog,
     },
 };
-use crate::utils;
+use crate::{api, utils};
 
 #[derive(Clone, Properties, PartialEq)]
 pub struct ProductItemProps {
-    pub name: String,
-    pub description: String,
-    pub seller: String,
-    pub stock: u32,
-    pub price: u32,
+    pub product: api::Product,
 }
 
 #[function_component(ProductItem)]
-pub fn product_item(product: &ProductItemProps) -> Html {
+pub fn product_item(props: &ProductItemProps) -> Html {
     let flow_state = use_state(|| PurchaseFlow::None);
 
     let buy_click_handler = {
@@ -41,18 +37,20 @@ pub fn product_item(product: &ProductItemProps) -> Html {
         })
     };
 
+    let product = &props.product;
+
     html! {
         <div class="product-item">
             <div class="product-info">
                 <div class="product-info--name">{product.name.clone()}</div>
                 <div class="product-info--metadata">
                     {"By "}
-                    <span class="product-info--seller">{product.seller.clone()}</span>
+                    <span class="product-info--seller">{"Rafael Girão" /* TODO */}</span>
                     {" | "}
                     <span class="product-info--stock">{product.stock}</span>
                     {" in stock"}
                 </div>
-                <div class="product-info--description">{product.description.clone()}</div>
+                <div class="product-info--description">{product.description.as_ref().unwrap_or(&String::new())}</div>
             </div>
             <div class="product-price">
                 {utils::format_display_price(product.price)}

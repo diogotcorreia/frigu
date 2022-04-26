@@ -4,6 +4,7 @@ use yew_router::prelude::*;
 mod components;
 mod pages;
 
+mod api;
 mod utils;
 
 use pages::product_page::ProductPage;
