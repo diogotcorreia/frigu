@@ -6,14 +6,16 @@
   top: 0;
   left: 0;
   right: 0;
-  
+
   @include flex($justifyContent: space-between);
   flex-wrap: wrap;
-  
+
+  @include box-shadow;
+
   .site-title {
     margin: 0;
   }
-  
+
   .nav-links {
     a {
       color: $navbarLinkColor;
@@ -22,16 +24,16 @@
       border-radius: $navbarLinkBorderRadius;
       transition: background-color 0.5s $transitionInOutCubic;
       font-size: 1.1em;
-      
+
       &:not(:last-of-type) {
         margin-right: spacing(2);
       }
-      
+
       &.active {
         color: $navbarLinkActiveColor;
         background-color: $navbarLinkHoverBackground;
       }
-      
+
       &:hover {
         background-color: $navbarLinkHoverBackground;
       }

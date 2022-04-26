@@ -1,18 +1,20 @@
 .card {
   background: $cardBackground;
   border-radius: $cardBorderRadius;
-  
+
   padding: spacing(4) spacing(3);
   margin: spacing(1) spacing(1);
-  
+
+  @include box-shadow;
+
   .card-header {
     font-size: 2em;
     font-weight: bold;
   }
-  
+
   .card-actions {
     margin-top: spacing(4);
-    
+
     @include flex($justifyContent: flex-end);
   }
 }
