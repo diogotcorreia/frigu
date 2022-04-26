@@ -5,7 +5,7 @@ use yew_router::prelude::*;
 
 use crate::{
     api,
-    components::{footer::Footer, navbar::Navbar, product::product_item::ProductItem},
+    components::{footer::Footer, navbar::Navbar},
     Route,
 };
 

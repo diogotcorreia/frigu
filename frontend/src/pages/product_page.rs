@@ -63,6 +63,7 @@ pub fn product_page() -> Html {
                         </div>
                     </div>
                 </div>
+                <a class="fab" href="/product/insert">{"+"}</a>
             </main>
             <Footer />
         </>
