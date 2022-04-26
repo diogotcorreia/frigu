@@ -1,0 +1,29 @@
+@import "_variables";
+@import "_utils";
+
+@import "cards";
+@import "buttons";
+@import "dialog";
+@import "header";
+@import "products";
+
+// Font: Inter
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+
+body {
+  margin: 0;
+  background: $background;
+  color: $textColor;
+  font-family: $font;
+
+  @include flex($alignItems: stretch, $justifyContent: stretch);
+  
+  padding: spacing(15) 0;
+}
+
+main {
+  @include flex($alignItems: flex-start);
+  flex-direction: row;
+
+  width: 100%;
+}

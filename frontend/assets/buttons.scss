@@ -1,0 +1,12 @@
+.btn {
+  box-shadow: none;
+  border: none;
+  background-color: $background;
+  color: $textColor;
+  padding: spacing(0.8) spacing(1.6);
+  font-weight: bold;
+  font-size: 1.3em;
+  border-radius: $borderRadius;
+  text-transform: uppercase;
+  cursor: pointer;
+}

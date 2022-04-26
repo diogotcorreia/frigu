@@ -1,0 +1,54 @@
+// Rosé Pine color scheme: https://rosepinetheme.com/palette
+$baseColor: #191724;
+$surfaceColor: #1f1d2e;
+$overlayColor: #26233a;
+$mutedColor: #6e6a86;
+$subtleColor: #908caa;
+$textColor: #e0def4;
+$loveColor: #eb6f92;
+$goldColor: #f6c177;
+$roseColor: #ebbcba;
+$pineColor: #31748f;
+$foamColor: #9ccfd8;
+$irisColor: #c4a7e7;
+$highlightLowColor: #21202e;
+$highlightMedColor: #403d52;
+$highlightHighColor: #524f67;
+
+// General settings
+$font: 'Inter', sans-serif;
+$spacingUnit: 0.5rem;
+$borderRadius: 0.5rem;
+$transitionInOutCubic: cubic-bezier(0.65, 0.05, 0.36, 1);
+
+$background: $baseColor;
+$textColor: $textColor;
+
+// Navbar settings
+$navbarBackground: $surfaceColor;
+$navbarLinkColor: $subtleColor;
+$navbarLinkActiveColor: $textColor;
+$navbarLinkHoverBackground: $highlightMedColor;
+$navbarLinkBorderRadius: $borderRadius;
+
+// Cards
+$cardBackground: $surfaceColor;
+$cardBorderRadius: $borderRadius;
+
+// Products
+$productItemSeparatorColor: $highlightMedColor;
+$productNameColor: $textColor;
+$productMetadataColor: $subtleColor;
+$productDescriptionColor: $subtleColor;
+$productPriceColor: $foamColor;
+$productBuyButtonColor: $goldColor;
+$productBuyButtonTextColor: $baseColor;
+$productCancelButtonColor: $loveColor;
+$productCancelButtonTextColor: $baseColor;
+$productDoneButtonColor: $foamColor;
+$productDoneButtonTextColor: $baseColor;
+$productQuantityButtonsBackground: $highlightMedColor;
+$productQuantityButtonsBorderRadius: $borderRadius;
+
+// Dialog
+$dialogBackdropColor: transparentize($overlayColor, 0.4);
