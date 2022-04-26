@@ -6,11 +6,11 @@ use sea_orm::entity::prelude::*;
 #[sea_orm(table_name = "transaction")]
 pub struct Model {
     #[sea_orm(primary_key)]
-    pub id: i32,
-    pub buyer: i32,
-    pub product: i32,
-    pub quantity: i32,
-    pub unit_price: i32,
+    pub id: u32,
+    pub buyer: u32,
+    pub product: u32,
+    pub quantity: u32,
+    pub unit_price: u32,
     pub date: DateTime,
     pub paid_date: Option<DateTime>,
 }

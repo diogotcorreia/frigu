@@ -18,7 +18,7 @@ impl MigrationTrait for Migration {
                     .if_not_exists()
                     .col(
                         ColumnDef::new(User::Id)
-                            .integer()
+                            .unsigned()
                             .not_null()
                             .auto_increment()
                             .primary_key(),
@@ -42,16 +42,16 @@ impl MigrationTrait for Migration {
                     .if_not_exists()
                     .col(
                         ColumnDef::new(Product::Id)
-                            .integer()
+                            .unsigned()
                             .not_null()
                             .auto_increment()
                             .primary_key(),
                     )
                     .col(ColumnDef::new(Product::Name).string().not_null())
-                    .col(ColumnDef::new(Product::Description).string().not_null())
-                    .col(ColumnDef::new(Product::Seller).integer().not_null())
-                    .col(ColumnDef::new(Product::Stock).integer().not_null())
-                    .col(ColumnDef::new(Product::Price).integer().not_null())
+                    .col(ColumnDef::new(Product::Description).string())
+                    .col(ColumnDef::new(Product::Seller).unsigned().not_null())
+                    .col(ColumnDef::new(Product::Stock).unsigned().not_null())
+                    .col(ColumnDef::new(Product::Price).unsigned().not_null())
                     .foreign_key(
                         ForeignKey::create()
                             .name("fk-product-seller")
@@ -71,15 +71,15 @@ impl MigrationTrait for Migration {
                     .if_not_exists()
                     .col(
                         ColumnDef::new(Transaction::Id)
-                            .integer()
+                            .unsigned()
                             .not_null()
                             .auto_increment()
                             .primary_key(),
                     )
-                    .col(ColumnDef::new(Transaction::Buyer).integer().not_null())
-                    .col(ColumnDef::new(Transaction::Product).integer().not_null())
-                    .col(ColumnDef::new(Transaction::Quantity).integer().not_null())
-                    .col(ColumnDef::new(Transaction::UnitPrice).integer().not_null())
+                    .col(ColumnDef::new(Transaction::Buyer).unsigned().not_null())
+                    .col(ColumnDef::new(Transaction::Product).unsigned().not_null())
+                    .col(ColumnDef::new(Transaction::Quantity).unsigned().not_null())
+                    .col(ColumnDef::new(Transaction::UnitPrice).unsigned().not_null())
                     .col(ColumnDef::new(Transaction::Date).date_time().not_null())
                     .col(ColumnDef::new(Transaction::PaidDate).date_time())
                     .foreign_key(

@@ -1,14 +1,26 @@
 use axum::body::{boxed, Body};
 use axum::http::{Response, StatusCode};
-use axum::{response::IntoResponse, routing::get, Router};
+use axum::{
+    response::IntoResponse,
+    routing::{get, post},
+    Router,
+};
 use clap::Parser;
+use migration::{Migrator, MigratorTrait};
+use sea_orm::Database;
+use std::env;
 use std::net::{IpAddr, Ipv6Addr, SocketAddr};
 use std::path::PathBuf;
 use std::str::FromStr;
 use tokio::fs;
 use tower::{ServiceBuilder, ServiceExt};
+use tower_http::add_extension::AddExtensionLayer;
 use tower_http::services::ServeDir;
 use tower_http::trace::TraceLayer;
+
+mod dtos;
+mod errors;
+mod product_routes;
 
 // Setup the command line interface with clap.
 #[derive(Parser, Debug)]
@@ -42,8 +54,21 @@ async fn main() {
     // enable console logging
     tracing_subscriber::fmt::init();
 
+    dotenv::dotenv().ok();
+    let db_url = env::var("DATABASE_URL").expect("DATABASE_URL is not set in .env file");
+
+    let conn = Database::connect(db_url)
+        .await
+        .expect("Database connection failed");
+    Migrator::up(&conn, None).await.unwrap();
+
+    let api_routes = Router::new()
+        .route("/hello", get(hello))
+        .route("/products", get(product_routes::list))
+        .route("/product", post(product_routes::insert));
+
     let app = Router::new()
-        .route("/api/hello", get(hello))
+        .nest("/api", api_routes)
         .fallback(get(|req| async move {
             match ServeDir::new(&opt.static_dir).oneshot(req).await {
                 Ok(res) => match res.status() {
@@ -72,7 +97,11 @@ async fn main() {
                     .expect("error response"),
             }
         }))
-        .layer(ServiceBuilder::new().layer(TraceLayer::new_for_http()));
+        .layer(
+            ServiceBuilder::new()
+                .layer(AddExtensionLayer::new(conn))
+                .layer(TraceLayer::new_for_http()),
+        );
 
     let sock_addr = SocketAddr::from((
         IpAddr::from_str(opt.addr.as_str()).unwrap_or(IpAddr::V6(Ipv6Addr::LOCALHOST)),
