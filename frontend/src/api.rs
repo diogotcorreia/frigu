@@ -11,6 +11,8 @@ pub struct Product {
     pub id: u32,
     pub name: String,
     pub description: Option<String>,
+    pub seller_id: u32,
+    pub seller_name: String,
     pub price: u32,
     pub stock: u32,
 }

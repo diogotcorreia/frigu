@@ -38,7 +38,7 @@ pub fn product_purchase_dialog(props: &ProductPurchaseDialogProps) -> Html {
                     {format!("Purchase {}", product.name.clone())}
                 </div>
                 <div class="card-content">
-                    <div class="product-info--metadata">{format!("By {}", "Rafael Girão" /* TODO */)}</div>
+                    <div class="product-info--metadata">{format!("By {}", product.seller_name.clone())}</div>
                     <div class="product-quantity">
                         <div class="product-quantity--selector">
                             <button class="btn product-quantity--btn" disabled={*quantity <= 1} onclick={decrease_qnt_handle}>{"-"}</button>

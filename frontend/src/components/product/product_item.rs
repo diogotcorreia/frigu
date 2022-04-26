@@ -45,7 +45,7 @@ pub fn product_item(props: &ProductItemProps) -> Html {
                 <div class="product-info--name">{product.name.clone()}</div>
                 <div class="product-info--metadata">
                     {"By "}
-                    <span class="product-info--seller">{"Rafael Girão" /* TODO */}</span>
+                    <span class="product-info--seller">{product.seller_name.clone()}</span>
                     {" | "}
                     <span class="product-info--stock">{product.stock}</span>
                     {" in stock"}
