@@ -4,22 +4,24 @@ use entity::{
     product::{self, Entity as Product},
     sea_orm,
 };
-use sea_orm::{prelude::*, DatabaseConnection, JsonValue, QueryOrder, Set};
+use sea_orm::{prelude::*, DatabaseConnection, QueryOrder, Set};
 
 use crate::dtos::ProductDto;
 use crate::errors::AppError;
 
 pub(crate) async fn list(
     Extension(ref conn): Extension<DatabaseConnection>,
-) -> Result<Json<Vec<JsonValue>>, AppError> {
-    Ok(Json(
-        Product::find()
-            .filter(product::Column::Stock.gt(0))
-            .order_by_desc(product::Column::Stock)
-            .into_json()
-            .all(conn)
-            .await?,
-    ))
+) -> Result<Json<Vec<ProductDto>>, AppError> {
+    let entities = Product::find()
+        .filter(product::Column::Stock.gt(0))
+        .order_by_desc(product::Column::Stock)
+        .all(conn)
+        .await?;
+    let mut dtos = Vec::with_capacity(entities.len());
+    for entity in entities {
+        dtos.push(ProductDto::from_entity(entity, conn).await?);
+    }
+    Ok(Json(dtos))
 }
 
 pub(crate) async fn insert(
