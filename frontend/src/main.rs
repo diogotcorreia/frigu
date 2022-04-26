@@ -8,7 +8,9 @@ mod pages;
 mod api;
 mod utils;
 
-use pages::{login_page::LoginPage, product_page::ProductPage};
+use pages::{
+    login_page::LoginPage, product_insert_page::ProductInsertPage, product_page::ProductPage,
+};
 
 #[derive(Clone, Routable, PartialEq)]
 enum Route {
@@ -18,6 +20,8 @@ enum Route {
     Login,
     #[at("/products")]
     ProductPage,
+    #[at("/product/insert")]
+    ProductInsertPage,
 }
 
 fn switch(routes: &Route) -> Html {
@@ -26,6 +30,7 @@ fn switch(routes: &Route) -> Html {
         Route::Home => html! { <Redirect<Route> to={Route::ProductPage} /> },
         Route::Login => html! { <LoginPage /> },
         Route::ProductPage => html! { <ProductPage /> },
+        Route::ProductInsertPage => html! { <ProductInsertPage /> },
     }
 }
 
