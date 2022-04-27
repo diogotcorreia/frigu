@@ -60,3 +60,8 @@ impl UserDto {
         })
     }
 }
+
+#[derive(Deserialize)]
+pub struct PurchaseDto {
+    pub(crate) quantity: u32,
+}

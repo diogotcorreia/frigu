@@ -1,12 +1,13 @@
-use axum::{extract, Extension, Json};
+use axum::{extract::{self, Path}, Extension, Json};
 use axum_extra::extract::CookieJar;
 use entity::{
     product::{self, Entity as Product},
+    purchase,
     sea_orm,
 };
-use sea_orm::{prelude::*, DatabaseConnection, QueryOrder, Set};
+use sea_orm::{prelude::*, DatabaseConnection, QueryOrder, Set, TransactionTrait};
 
-use crate::dtos::ProductDto;
+use crate::dtos::{ProductDto, PurchaseDto};
 use crate::errors::AppError;
 
 pub(crate) async fn list(
@@ -68,4 +69,41 @@ pub(crate) async fn insert(
     let new_product_dto = ProductDto::from_entity(product, conn).await?;
 
     Ok(Json(new_product_dto))
+}
+
+pub(crate) async fn purchase(
+    Path(product_id): Path<u32>,
+    Json(purchase_dto): Json<PurchaseDto>,
+    Extension(ref conn): Extension<DatabaseConnection>,
+    jar: CookieJar,
+    ) -> Result<(), AppError> {
+    let buyer_id = crate::jwt_helpers::get_login(&jar)?;
+
+    let txn = conn.begin().await?;
+
+    let mut product = Product::find_by_id(product_id)
+        .one(conn)
+        .await?
+        .ok_or(AppError::NoSuchProduct)?;
+
+    if product.stock < purchase_dto.quantity {
+        return Err(AppError::NotEnoughStock);
+    }
+
+    let now = chrono::offset::Utc::now();
+
+    let purchase = purchase::ActiveModel {
+        buyer: Set(buyer_id),
+        product: Set(product.id),
+        quantity: Set(purchase_dto.quantity),
+        unit_price: Set(product.price),
+        date: Set(now),
+        ..Default::default()
+    };
+    purchase.insert(conn).await?;
+
+    product.stock -= purchase_dto.quantity;
+
+    txn.commit().await?;
+    Ok(())
 }

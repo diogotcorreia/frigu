@@ -1,7 +1,6 @@
 use axum::body::{boxed, Body};
 use axum::http::{Response, StatusCode};
 use axum::{
-    response::IntoResponse,
     routing::{get, post},
     Router,
 };
@@ -69,7 +68,8 @@ async fn main() {
         .route("/user/info", get(user_routes::user_info))
         .route("/logout", get(user_routes::logout))
         .route("/products", get(product_routes::list))
-        .route("/product", post(product_routes::insert));
+        .route("/product", post(product_routes::insert))
+        .route("product/:id/purchase", post(product_routes::purchase));
 
     let app = Router::new()
         .nest("/api", api_routes)
