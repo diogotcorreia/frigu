@@ -11,8 +11,8 @@ pub struct Model {
     pub product: u32,
     pub quantity: u32,
     pub unit_price: u32,
-    pub date: DateTime,
-    pub paid_date: Option<DateTime>,
+    pub date: DateTimeUtc,
+    pub paid_date: Option<DateTimeUtc>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
