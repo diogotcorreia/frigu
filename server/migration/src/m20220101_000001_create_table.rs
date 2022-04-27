@@ -67,33 +67,33 @@ impl MigrationTrait for Migration {
         manager
             .create_table(
                 Table::create()
-                    .table(Transaction::Table)
+                    .table(Purchase::Table)
                     .if_not_exists()
                     .col(
-                        ColumnDef::new(Transaction::Id)
+                        ColumnDef::new(Purchase::Id)
                             .unsigned()
                             .not_null()
                             .auto_increment()
                             .primary_key(),
                     )
-                    .col(ColumnDef::new(Transaction::Buyer).unsigned().not_null())
-                    .col(ColumnDef::new(Transaction::Product).unsigned().not_null())
-                    .col(ColumnDef::new(Transaction::Quantity).unsigned().not_null())
-                    .col(ColumnDef::new(Transaction::UnitPrice).unsigned().not_null())
-                    .col(ColumnDef::new(Transaction::Date).date_time().not_null())
-                    .col(ColumnDef::new(Transaction::PaidDate).date_time())
+                    .col(ColumnDef::new(Purchase::Buyer).unsigned().not_null())
+                    .col(ColumnDef::new(Purchase::Product).unsigned().not_null())
+                    .col(ColumnDef::new(Purchase::Quantity).unsigned().not_null())
+                    .col(ColumnDef::new(Purchase::UnitPrice).unsigned().not_null())
+                    .col(ColumnDef::new(Purchase::Date).date_time().not_null())
+                    .col(ColumnDef::new(Purchase::PaidDate).date_time())
                     .foreign_key(
                         ForeignKey::create()
-                            .name("fk-transaction-buyer")
-                            .from(Transaction::Table, Transaction::Buyer)
+                            .name("fk-purchase-buyer")
+                            .from(Purchase::Table, Purchase::Buyer)
                             .to(User::Table, User::Id)
                             .on_delete(ForeignKeyAction::Restrict)
                             .on_update(ForeignKeyAction::Cascade),
                     )
                     .foreign_key(
                         ForeignKey::create()
-                            .name("fk-transaction-product")
-                            .from(Transaction::Table, Transaction::Product)
+                            .name("fk-purchase-product")
+                            .from(Purchase::Table, Purchase::Product)
                             .to(Product::Table, Product::Id)
                             .on_delete(ForeignKeyAction::Restrict)
                             .on_update(ForeignKeyAction::Cascade),
@@ -111,7 +111,7 @@ impl MigrationTrait for Migration {
             .drop_table(Table::drop().table(Product::Table).to_owned())
             .await?;
         manager
-            .drop_table(Table::drop().table(Transaction::Table).to_owned())
+            .drop_table(Table::drop().table(Purchase::Table).to_owned())
             .await
     }
 }
@@ -137,7 +137,7 @@ pub enum Product {
 }
 
 #[derive(Iden)]
-pub enum Transaction {
+pub enum Purchase {
     Table,
     Id,
     Buyer,
