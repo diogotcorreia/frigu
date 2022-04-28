@@ -31,3 +31,23 @@ pub(crate) async fn seller_summary(
     }
     Ok(Json(dtos))
 }
+
+pub(crate) async fn purchase_history(
+    Extension(ref conn): Extension<DatabaseConnection>,
+    jar: CookieJar,
+) -> Result<Json<Vec<PurchaseDto>>, AppError> {
+    let seller_id = crate::jwt_helpers::get_login(&jar)?;
+
+    let entities = Purchase::find()
+        .join(JoinType::InnerJoin, purchase::Relation::User.def())
+        .filter(user::Column::Id.eq(seller_id))
+        .order_by_desc(purchase::Column::Date)
+        .all(conn)
+        .await?;
+    let mut dtos = Vec::with_capacity(entities.len());
+    // FIXME: converting this model to DTO will trigger 3 SQL queries for each entity
+    for entity in entities {
+        dtos.push(PurchaseDto::from_entity(entity, conn).await?);
+    }
+    Ok(Json(dtos))
+}
