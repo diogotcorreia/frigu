@@ -46,6 +46,6 @@ pub(crate) async fn user_info(
     Ok(Json(UserDto::from_entity(user)?))
 }
 
-pub(crate) async fn logout(jar: CookieJar) -> Result<CookieJar, AppError> {
-    Ok(jar.remove(Cookie::named("jwt")))
+pub(crate) async fn logout(jar: CookieJar) -> CookieJar {
+    jar.remove(Cookie::named("jwt"))
 }
