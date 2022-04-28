@@ -10,6 +10,8 @@ use serde_json::json;
 pub(crate) enum AppError {
     BadInput(&'static str),
     NoSuchUser,
+    NoSuchProduct,
+    NotEnoughStock,
     Unauthorized,
     JwtError(jwt::error::Error),
     PwhError(PwHashError),
@@ -21,6 +23,8 @@ impl IntoResponse for AppError {
         let (status, error_message) = match self {
             AppError::BadInput(message) => (StatusCode::BAD_REQUEST, message),
             AppError::NoSuchUser => (StatusCode::BAD_REQUEST, "no such user"),
+            AppError::NoSuchProduct => (StatusCode::NOT_FOUND, "no such product"),
+            AppError::NotEnoughStock => (StatusCode::CONFLICT, "not enough stock"),
             AppError::PwhError(PwHashError::Password) => {
                 (StatusCode::UNAUTHORIZED, "wrong password")
             }

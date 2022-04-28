@@ -24,8 +24,8 @@ pub enum Relation {
         on_delete = "Restrict"
     )]
     User,
-    #[sea_orm(has_many = "super::transaction::Entity")]
-    Transaction,
+    #[sea_orm(has_many = "super::purchase::Entity")]
+    Purchase,
 }
 
 impl Related<super::user::Entity> for Entity {
@@ -34,9 +34,9 @@ impl Related<super::user::Entity> for Entity {
     }
 }
 
-impl Related<super::transaction::Entity> for Entity {
+impl Related<super::purchase::Entity> for Entity {
     fn to() -> RelationDef {
-        Relation::Transaction.def()
+        Relation::Purchase.def()
     }
 }
 
