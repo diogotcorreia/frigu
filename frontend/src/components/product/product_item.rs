@@ -1,3 +1,4 @@
+use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
 
 use crate::components::{
@@ -12,6 +13,7 @@ use crate::{api, utils};
 #[derive(Clone, Properties, PartialEq)]
 pub struct ProductItemProps {
     pub product: api::Product,
+    pub on_update: Callback<()>,
 }
 
 #[function_component(ProductItem)]
@@ -30,10 +32,22 @@ pub fn product_item(props: &ProductItemProps) -> Html {
 
     let dialog_buy_handler = {
         let flow_state = flow_state.clone();
-        Callback::from(move |_amount: u32| {
+        let on_update = props.on_update.clone();
+        let product_id = props.product.id;
+        Callback::from(move |quantity: u32| {
+            let flow_state = flow_state.clone();
+            let on_update = on_update.clone();
             flow_state.set(PurchaseFlow::Loading);
-            // TODO send request to backend
-            flow_state.set(PurchaseFlow::Complete);
+            spawn_local(async move {
+                let payload = api::PurchaseProductPayload { quantity };
+                match api::purchase_product(product_id, &payload).await {
+                    Ok(_) => {
+                        flow_state.set(PurchaseFlow::Complete);
+                        on_update.emit(());
+                    }
+                    Err(_) => { /* TODO */ }
+                };
+            })
         })
     };
 
