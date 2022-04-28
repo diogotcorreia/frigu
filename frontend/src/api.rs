@@ -56,6 +56,29 @@ pub async fn insert_product(product: &ProductPayload) -> Result<Product, ApiErro
     }
 }
 
+#[derive(Clone, Serialize)]
+pub struct PurchaseProductPayload {
+    pub quantity: u32,
+}
+
+pub async fn purchase_product(
+    product_id: u32,
+    payload: &PurchaseProductPayload,
+) -> Result<(), ApiError> {
+    let resp = Request::post(&format!("/api/product/{}/purchase", product_id))
+        .json(payload)
+        .expect("payload must be serializable to json")
+        .send()
+        .await
+        .unwrap();
+
+    if resp.ok() {
+        Ok(())
+    } else {
+        Err(ApiError::ConnectionError)
+    }
+}
+
 #[derive(Serialize, Deserialize)]
 pub struct LoginPayload {
     pub phone: String,
