@@ -9,9 +9,26 @@
   border-radius: $borderRadius;
   text-transform: uppercase;
   cursor: pointer;
-  
+
   &.btn--full-width {
     width: 100%;
     box-sizing: border-box;
   }
+}
+
+.fab {
+  position: fixed;
+  bottom: spacing(4);
+  right: spacing(4);
+
+  width: 4rem;
+  height: 4rem;
+  border-radius: 100%;
+
+  background-color: $fabBackgroundColor;
+  color: inherit;
+  text-decoration: none;
+
+  @include flex($alignItems: baseline);
+  font-size: 3rem;
 }

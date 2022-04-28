@@ -38,12 +38,12 @@ pub fn product_page() -> Html {
                         <div class="product-list">
                             {
                                 if let Some(product_list) = &*products {
-                                    if product_list.len() == 0 {
+                                    if product_list.is_empty() {
                                         html! {
                                             <p>{"There are no products in stock"}</p>
                                         }
                                     } else {
-                                        product_list.into_iter()
+                                        product_list.iter()
                                             .map(|product| {
                                                 html! {
                                                     <ProductItem
@@ -63,6 +63,7 @@ pub fn product_page() -> Html {
                         </div>
                     </div>
                 </div>
+                <a class="fab" href="/product/insert">{"+"}</a>
             </main>
             <Footer />
         </>

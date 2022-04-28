@@ -14,6 +14,10 @@
 
   .site-title {
     margin: 0;
+    a {
+      color: $textColor;
+      text-decoration: none;
+    }
   }
 
   .nav-links {

@@ -30,6 +30,32 @@ pub async fn list_products() -> Result<Vec<Product>, ApiError> {
     }
 }
 
+#[derive(Clone, Serialize)]
+pub struct ProductPayload {
+    pub id: Option<u32>,
+    pub name: String,
+    pub description: Option<String>,
+    pub stock: u32,
+    pub price: u32,
+}
+
+pub async fn insert_product(product: &ProductPayload) -> Result<Product, ApiError> {
+    let resp = Request::post("/api/product")
+        .json(product)
+        .expect("payload must be serializable to json")
+        .send()
+        .await
+        .unwrap();
+
+    if resp.ok() {
+        // TODO handle errors
+        let product = resp.json().await.unwrap();
+        Ok(product)
+    } else {
+        Err(ApiError::ConnectionError)
+    }
+}
+
 #[derive(Serialize, Deserialize)]
 pub struct LoginPayload {
     pub phone: String,

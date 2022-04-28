@@ -12,7 +12,6 @@ pub fn login_page() -> Html {
     let password_ref = use_node_ref();
 
     let handle_submit = {
-        let history = history.clone();
         let phone_ref = phone_ref.clone();
         let password_ref = password_ref.clone();
         Callback::from(move |event: FocusEvent| {
@@ -31,7 +30,7 @@ pub fn login_page() -> Html {
                     Ok(()) => {
                         history.push(Route::Home);
                     }
-                    Err(_) => (),
+                    Err(_) => (/* TODO handle errors */),
                 };
             })
         })
