@@ -66,3 +66,9 @@ impl UserDto {
     }
 }
 
+#[derive(Deserialize)]
+pub struct RegisterDto {
+    pub(crate) name: String,
+    pub(crate) phone_number: String,
+    pub(crate) password: String,
+}

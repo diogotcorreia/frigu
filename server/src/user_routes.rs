@@ -1,12 +1,16 @@
-use argon2::{Argon2, PasswordHash, PasswordVerifier};
+use argon2::{
+    password_hash::{rand_core::OsRng, SaltString},
+    Argon2, PasswordHash, PasswordHasher, PasswordVerifier,
+};
 use axum::{extract, Extension, Json};
+use axum_client_ip::ClientIp;
 use axum_extra::extract::cookie::{Cookie, CookieJar};
-use sea_orm::{prelude::*, DatabaseConnection};
+use sea_orm::{prelude::*, DatabaseConnection, Set};
 
 use entity::user;
 
 use crate::{
-    dtos::{LoginDto, UserDto},
+    dtos::{LoginDto, RegisterDto, UserDto},
     errors::AppError,
 };
 
@@ -48,4 +52,47 @@ pub(crate) async fn user_info(
 
 pub(crate) async fn logout(jar: CookieJar) -> CookieJar {
     jar.remove(Cookie::named("jwt"))
+}
+
+pub(crate) async fn register(
+    extract::Json(register_dto): extract::Json<RegisterDto>,
+    ClientIp(ip): ClientIp,
+    Extension(ref conn): Extension<DatabaseConnection>,
+) -> Result<Json<UserDto>, AppError> {
+    if !ip.is_loopback() {
+        return Err(AppError::Forbidden);
+    }
+
+    let name = register_dto.name;
+    if name.is_empty() {
+        return Err(AppError::BadInput("name can't be empty"));
+    }
+    if name.len() > 30 {
+        return Err(AppError::BadInput("name can't be longer than 30"));
+    }
+
+    let phone_number = register_dto.phone_number;
+    if phone_number.len() != 9 || phone_number.chars().all(|c| c.is_digit(10)) {
+        return Err(AppError::BadInput("phone number must be 9 digits long"));
+    }
+
+    let password = register_dto.password;
+    if password.len() < 8 {
+        return Err(AppError::BadInput("password must be at least 8 characters"));
+    }
+    let salt = SaltString::generate(&mut OsRng);
+    let password_hash = Argon2::default()
+        .hash_password(password.as_bytes(), &salt)?
+        .to_string();
+
+    let user = user::ActiveModel {
+        name: Set(name.to_string()),
+        phone_number: Set(phone_number),
+        hashed_password: Set(password_hash),
+        ..Default::default()
+    };
+
+    let user = user.insert(conn).await?;
+
+    Ok(Json(UserDto::from_entity(user)?))
 }

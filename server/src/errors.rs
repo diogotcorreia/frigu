@@ -13,6 +13,7 @@ pub(crate) enum AppError {
     NoSuchProduct,
     NotEnoughStock,
     Unauthorized,
+    Forbidden,
     JwtError(jwt::error::Error),
     PwhError(PwHashError),
     DbError(DbErr),
@@ -31,6 +32,7 @@ impl IntoResponse for AppError {
             AppError::PwhError(_) | AppError::DbError(_) | AppError::JwtError(_) => {
                 (StatusCode::INTERNAL_SERVER_ERROR, "internal servor error")
             }
+            AppError::Forbidden => (StatusCode::FORBIDDEN, "admin only"),
             // TODO: how to clear jar **and** return StatusCode?
             // maybe UNAUTHORIZED redirects to login page?
             AppError::Unauthorized => (StatusCode::UNAUTHORIZED, "login required"),
