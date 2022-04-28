@@ -11,7 +11,6 @@ pub fn footer() -> Html {
     let user = use_auth();
 
     let handle_logout = {
-        let history = history.clone();
         Callback::from(move |_| {
             let history = history.clone();
             spawn_local(async move {

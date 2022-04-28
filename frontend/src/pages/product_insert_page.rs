@@ -18,7 +18,6 @@ pub fn product_insert_page() -> Html {
     let price_ref = use_node_ref();
 
     let handle_submit = {
-        let history = history.clone();
         let name_ref = name_ref.clone();
         let description_ref = description_ref.clone();
         let stock_ref = stock_ref.clone();

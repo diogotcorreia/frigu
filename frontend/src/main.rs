@@ -14,6 +14,7 @@ use pages::{
 
 #[derive(Clone, Routable, PartialEq)]
 enum Route {
+    #[not_found]
     #[at("/")]
     Home,
     #[at("/login")]
