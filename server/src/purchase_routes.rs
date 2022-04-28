@@ -20,6 +20,7 @@ pub(crate) async fn seller_summary(
         .join(JoinType::InnerJoin, purchase::Relation::Product.def())
         .join(JoinType::InnerJoin, product::Relation::User.def())
         .filter(user::Column::Id.eq(seller_id))
+        .filter(purchase::Column::PaidDate.is_null())
         .order_by_desc(purchase::Column::Date)
         .all(conn)
         .await?;
