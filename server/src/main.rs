@@ -21,6 +21,7 @@ mod dtos;
 mod errors;
 mod jwt_helpers;
 mod product_routes;
+mod purchase_routes;
 mod user_routes;
 
 // Setup the command line interface with clap.
@@ -69,7 +70,11 @@ async fn main() {
         .route("/logout", get(user_routes::logout))
         .route("/products", get(product_routes::list))
         .route("/product", post(product_routes::insert))
-        .route("/product/:id/purchase", post(product_routes::purchase));
+        .route("/product/:id/purchase", post(product_routes::purchase))
+        .route(
+            "/purchases/seller-summary",
+            get(purchase_routes::seller_summary),
+        );
 
     let app = Router::new()
         .nest("/api", api_routes)
