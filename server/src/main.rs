@@ -76,7 +76,7 @@ async fn main() {
             get(purchase_routes::seller_summary),
         )
         .route("/purchases/history", get(purchase_routes::purchase_history))
-        .route("/purchase/:id/pay", get(purchase_routes::pay_purchase));
+        .route("/purchase/:id/pay", post(purchase_routes::pay_purchase));
 
     let app = Router::new()
         .nest("/api", api_routes)
