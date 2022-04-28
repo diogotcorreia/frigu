@@ -69,7 +69,7 @@ async fn main() {
         .route("/logout", get(user_routes::logout))
         .route("/products", get(product_routes::list))
         .route("/product", post(product_routes::insert))
-        .route("product/:id/purchase", post(product_routes::purchase));
+        .route("/product/:id/purchase", post(product_routes::purchase));
 
     let app = Router::new()
         .nest("/api", api_routes)
