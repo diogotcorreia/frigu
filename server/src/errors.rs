@@ -11,6 +11,7 @@ pub(crate) enum AppError {
     BadInput(&'static str),
     NoSuchUser,
     NoSuchProduct,
+    NoSuchPurchase,
     NotEnoughStock,
     Unauthorized,
     JwtError(jwt::error::Error),
@@ -24,6 +25,7 @@ impl IntoResponse for AppError {
             AppError::BadInput(message) => (StatusCode::BAD_REQUEST, message),
             AppError::NoSuchUser => (StatusCode::BAD_REQUEST, "no such user"),
             AppError::NoSuchProduct => (StatusCode::NOT_FOUND, "no such product"),
+            AppError::NoSuchPurchase => (StatusCode::NOT_FOUND, "no such purchase"),
             AppError::NotEnoughStock => (StatusCode::CONFLICT, "not enough stock"),
             AppError::PwhError(PwHashError::Password) => {
                 (StatusCode::UNAUTHORIZED, "wrong password")
