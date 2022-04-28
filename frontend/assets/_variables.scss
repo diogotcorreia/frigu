@@ -53,6 +53,19 @@ $productDoneButtonTextColor: $baseColor;
 $productQuantityButtonsBackground: $highlightMedColor;
 $productQuantityButtonsBorderRadius: $borderRadius;
 
+// Purchases
+$purchaseItemSeparatorColor: $highlightMedColor;
+$purchaseNameColor: $textColor;
+$purchaseMetadataColor: $subtleColor;
+$purchaseDescriptionColor: $subtleColor;
+$purchasePriceColor: $foamColor;
+$purchaseMarkAsPaidButtonColor: $pineColor;
+$purchaseMarkAsPaidButtonTextColor: $textColor;
+$paidBadgeBackgroundColor: $pineColor;
+$paidBadgeTextColor: $textColor;
+$unpaidBadgeBackgroundColor: $loveColor;
+$unpaidBadgeTextColor: $baseColor;
+
 // Dialog
 $dialogBackdropColor: transparentize($overlayColor, 0.4);
 

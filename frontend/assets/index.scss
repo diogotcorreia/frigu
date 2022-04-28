@@ -8,6 +8,7 @@
 @import "forms";
 @import "header";
 @import "products";
+@import "purchases";
 
 // Font: Inter
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
@@ -27,6 +28,7 @@ main {
   @include flex($alignItems: flex-start);
   flex-grow: 1;
   flex-direction: row;
+  flex-wrap: wrap;
 
   width: 100%;
   margin: spacing(15) 0;
