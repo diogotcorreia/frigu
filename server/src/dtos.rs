@@ -39,6 +39,11 @@ impl ProductDto {
 }
 
 #[derive(Deserialize)]
+pub struct PurchaseDto {
+    pub(crate) quantity: u32,
+}
+
+#[derive(Deserialize)]
 pub struct LoginDto {
     pub(crate) phone: String,
     pub(crate) password: String,
@@ -61,7 +66,3 @@ impl UserDto {
     }
 }
 
-#[derive(Deserialize)]
-pub struct PurchaseDto {
-    pub(crate) quantity: u32,
-}
