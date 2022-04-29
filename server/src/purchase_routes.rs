@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use axum::{extract::Path, Extension, Json};
 use axum_extra::extract::CookieJar;
 use entity::{
@@ -9,19 +11,19 @@ use sea_orm::{
     prelude::*, DatabaseConnection, JoinType, QueryOrder, QuerySelect, Set, TransactionTrait,
 };
 
-use crate::dtos::PurchaseDto;
+use crate::dtos::{BuyerGroupedPurchasesDto, PurchaseDto, SellerSummaryDto};
 use crate::errors::AppError;
 
 pub(crate) async fn seller_summary(
     Extension(ref conn): Extension<DatabaseConnection>,
     jar: CookieJar,
-) -> Result<Json<Vec<PurchaseDto>>, AppError> {
+) -> Result<Json<SellerSummaryDto>, AppError> {
     let seller_id = crate::jwt_helpers::get_login(&jar)?;
 
+    // Sold products
     let entities = Purchase::find()
         .join(JoinType::InnerJoin, purchase::Relation::Product.def())
-        .join(JoinType::InnerJoin, product::Relation::User.def())
-        .filter(user::Column::Id.eq(seller_id))
+        .filter(product::Column::Seller.eq(seller_id))
         .filter(purchase::Column::PaidDate.is_null())
         .order_by_desc(purchase::Column::Date)
         .all(conn)
@@ -31,7 +33,48 @@ pub(crate) async fn seller_summary(
     for entity in entities {
         dtos.push(PurchaseDto::from_entity(entity, conn).await?);
     }
-    Ok(Json(dtos))
+
+    // Grouped amount due per user
+    let buyer_grouped_purchases: Vec<BuyerGroupedPurchasesDto> = dtos
+        .iter()
+        .fold(HashMap::new(), |mut acc, purchase| {
+            let buyer_id = purchase.buyer.as_ref().expect("buyer must exist").id;
+            match acc.get_mut(&buyer_id) {
+                None => {
+                    acc.insert(buyer_id, vec![purchase]);
+                }
+                Some(vec) => {
+                    vec.push(purchase);
+                }
+            };
+            acc
+        })
+        .iter()
+        .map(|(_, buyer_purchases)| {
+            let amount_due: u32 = buyer_purchases
+                .iter()
+                .map(|purchase| {
+                    purchase.quantity * purchase.unit_price.expect("purchase must have unit price")
+                })
+                .sum();
+
+            BuyerGroupedPurchasesDto {
+                buyer: buyer_purchases
+                    .first()
+                    .expect("there must be at least one purchase")
+                    .buyer
+                    .as_ref()
+                    .expect("buyer must exist")
+                    .clone(),
+                amount_due,
+            }
+        })
+        .collect();
+
+    Ok(Json(SellerSummaryDto {
+        purchases: dtos,
+        summary: buyer_grouped_purchases,
+    }))
 }
 
 pub(crate) async fn purchase_history(
