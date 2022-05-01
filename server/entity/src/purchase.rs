@@ -50,14 +50,9 @@ impl Related<super::product::Entity> for Entity {
 impl ActiveModelBehavior for ActiveModel {
     // Will be triggered before insert / update
     fn before_save(self, insert: bool) -> Result<Self, DbErr> {
-        if self.unit_price.as_ref() < &0 {
+        if self.quantity.is_set() && self.quantity.as_ref() <= &0 {
             Err(DbErr::Custom(format!(
-                "[before_save] UnitPrice cannot be negative, insert: {}",
-                insert
-            )))
-        } else if self.quantity.as_ref() <= &0 {
-            Err(DbErr::Custom(format!(
-                "[before_save] Quantity cannot be zero nor negative, insert: {}",
+                "[before_save] Quantity cannot be zero, insert: {}",
                 insert
             )))
         } else {
