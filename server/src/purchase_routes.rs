@@ -12,13 +12,13 @@ use sea_orm::{
     TransactionTrait, Unchanged,
 };
 
-use crate::dtos::{BuyerGroupedPurchasesDto, PurchaseDto, SellerSummaryDto};
+use crate::dtos::{BuyerGroupedPurchasesDto, PurchaseDto};
 use crate::errors::AppError;
 
 pub(crate) async fn seller_summary(
     Extension(ref conn): Extension<DatabaseConnection>,
     jar: CookieJar,
-) -> Result<Json<SellerSummaryDto>, AppError> {
+) -> Result<Json<Vec<BuyerGroupedPurchasesDto>>, AppError> {
     let seller_id = crate::jwt_helpers::get_login(&jar)?;
 
     // Sold products
@@ -35,18 +35,18 @@ pub(crate) async fn seller_summary(
         dtos.push(PurchaseDto::from_entity(entity, conn).await?);
     }
 
-    // Grouped amount due per user
+    // Grouped amount due and purchases per user
     let buyer_grouped_purchases: Vec<BuyerGroupedPurchasesDto> = dtos
-        .iter()
+        .into_iter()
         .fold(
             HashMap::new(),
-            |mut acc: HashMap<u32, Vec<&PurchaseDto>>, purchase| {
+            |mut acc: HashMap<u32, Vec<PurchaseDto>>, purchase| {
                 let buyer_id = purchase.buyer.as_ref().expect("buyer must exist").id;
                 acc.entry(buyer_id).or_insert(Vec::new()).push(purchase);
                 acc
             },
         )
-        .iter()
+        .into_iter()
         .map(|(_, buyer_purchases)| {
             let amount_due: u32 = buyer_purchases
                 .iter()
@@ -64,14 +64,12 @@ pub(crate) async fn seller_summary(
                     .expect("buyer must exist")
                     .clone(),
                 amount_due,
+                purchases: buyer_purchases,
             }
         })
         .collect();
 
-    Ok(Json(SellerSummaryDto {
-        purchases: dtos,
-        summary: buyer_grouped_purchases,
-    }))
+    Ok(Json(buyer_grouped_purchases))
 }
 
 pub(crate) async fn purchase_history(

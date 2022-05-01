@@ -102,10 +102,5 @@ impl PurchaseDto {
 pub(crate) struct BuyerGroupedPurchasesDto {
     pub(crate) buyer: UserDto,
     pub(crate) amount_due: u32,
-}
-
-#[derive(Serialize)]
-pub(crate) struct SellerSummaryDto {
     pub(crate) purchases: Vec<PurchaseDto>,
-    pub(crate) summary: Vec<BuyerGroupedPurchasesDto>,
 }
