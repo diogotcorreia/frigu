@@ -84,7 +84,7 @@ pub(crate) async fn purchase(
     let txn = conn.begin().await?;
 
     let product = Product::find_by_id(product_id)
-        .one(conn)
+        .one(&txn)
         .await?
         .ok_or(AppError::NoSuchProduct)?;
 
@@ -102,13 +102,13 @@ pub(crate) async fn purchase(
         date: Set(now),
         ..Default::default()
     };
-    purchase.insert(conn).await?;
+    purchase.insert(&txn).await?;
 
     let mut product: product::ActiveModel = product.into();
     product.stock =
         Set(product.stock.take().expect("product must have stock") - purchase_dto.quantity);
 
-    product.update(conn).await?;
+    product.update(&txn).await?;
 
     txn.commit().await?;
     Ok(())
