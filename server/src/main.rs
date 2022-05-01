@@ -66,6 +66,7 @@ async fn main() {
 
     let api_routes = Router::new()
         .route("/login", post(user_routes::login))
+        .route("/register", post(user_routes::register))
         .route("/user/info", get(user_routes::user_info))
         .route("/logout", get(user_routes::logout))
         .route("/products", get(product_routes::list))
@@ -126,7 +127,7 @@ async fn main() {
     log::info!("listening on http://{}", sock_addr);
 
     axum::Server::bind(&sock_addr)
-        .serve(app.into_make_service())
+        .serve(app.into_make_service_with_connect_info::<SocketAddr>())
         .await
         .expect("Unable to start server");
 }
