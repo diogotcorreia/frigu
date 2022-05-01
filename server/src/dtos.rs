@@ -104,3 +104,8 @@ pub(crate) struct BuyerGroupedPurchasesDto {
     pub(crate) amount_due: u32,
     pub(crate) purchases: Vec<PurchaseDto>,
 }
+
+#[derive(Deserialize)]
+pub(crate) struct PayPurchaseUserBulkDto {
+    pub(crate) count: u64,
+}

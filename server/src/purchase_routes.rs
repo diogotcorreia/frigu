@@ -1,18 +1,22 @@
 use std::collections::HashMap;
 
-use axum::{extract::Path, Extension, Json};
+use axum::{
+    extract::{self, Path},
+    Extension, Json,
+};
 use axum_extra::extract::CookieJar;
 use entity::{
     product,
     purchase::{self, Entity as Purchase},
     sea_orm, user,
 };
+use migration::{Expr, Query};
 use sea_orm::{
     prelude::*, DatabaseConnection, FromQueryResult, JoinType, QueryOrder, QuerySelect, Set,
     TransactionTrait, Unchanged,
 };
 
-use crate::dtos::{BuyerGroupedPurchasesDto, PurchaseDto};
+use crate::dtos::{BuyerGroupedPurchasesDto, PayPurchaseUserBulkDto, PurchaseDto};
 use crate::errors::AppError;
 
 pub(crate) async fn seller_summary(
@@ -131,6 +135,47 @@ pub(crate) async fn pay_purchase(
     };
 
     purchase.save(&txn).await?;
+
+    txn.commit().await?;
+    Ok(())
+}
+
+pub(crate) async fn pay_purchase_user_bulk(
+    Path(buyer_id): Path<u32>,
+    extract::Json(action_dto): extract::Json<PayPurchaseUserBulkDto>,
+    Extension(ref conn): Extension<DatabaseConnection>,
+    jar: CookieJar,
+) -> Result<(), AppError> {
+    let seller_id = crate::jwt_helpers::get_login(&jar)?;
+
+    let txn = conn.begin().await?;
+
+    let now = chrono::offset::Utc::now();
+    let purchase = purchase::ActiveModel {
+        paid_date: Set(Some(now)),
+        ..Default::default()
+    };
+
+    let result = Purchase::update_many()
+        .set(purchase)
+        .filter(purchase::Column::Buyer.eq(buyer_id))
+        .filter(
+            purchase::Column::Product.in_subquery(
+                Query::select()
+                    .expr(Expr::col(product::Column::Id))
+                    .from(product::Entity)
+                    .and_where(Expr::col(product::Column::Seller).eq(seller_id))
+                    .to_owned(),
+            ),
+        )
+        .filter(purchase::Column::PaidDate.is_null())
+        .exec(&txn)
+        .await?;
+
+    dbg!(&result);
+    if result.rows_affected != action_dto.count {
+        return Err(AppError::BulkCountMismatch);
+    }
 
     txn.commit().await?;
     Ok(())

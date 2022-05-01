@@ -14,6 +14,7 @@ pub(crate) enum AppError {
     NoSuchPurchase,
     NotEnoughStock,
     PurchaseAlreadyPaid,
+    BulkCountMismatch,
     Unauthorized,
     Forbidden,
     JwtError(jwt::error::Error),
@@ -32,6 +33,10 @@ impl IntoResponse for AppError {
             AppError::PurchaseAlreadyPaid => {
                 (StatusCode::CONFLICT, "purchase has already been paid")
             }
+            AppError::BulkCountMismatch => (
+                StatusCode::CONFLICT,
+                "affected count is different than expected",
+            ),
             AppError::PwhError(PwHashError::Password) => {
                 (StatusCode::UNAUTHORIZED, "wrong password")
             }
