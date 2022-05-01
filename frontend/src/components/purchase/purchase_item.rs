@@ -47,9 +47,6 @@ pub fn purchase_item(props: &PurchaseItemProps) -> Html {
                         if props.is_seller {
                             html! {
                                 <>
-                                    {"Bought by "}
-                                    <span class="purchase-info--buyer">{purchase.buyer.name.clone()}</span>
-                                    {" | "}
                                     <span class="purchase-info--quantity">{purchase.quantity}</span>
                                     {" sold"}
                                 </>
@@ -76,7 +73,7 @@ pub fn purchase_item(props: &PurchaseItemProps) -> Html {
                 if props.is_seller {
                     html! {
                         <div class="purchase-actions">
-                            <button onclick={handle_mark_as_paid} class="btn purchase-actions--pay">{"Mark as Paid"}</button>
+                            <button onclick={handle_mark_as_paid} class="btn purchase-actions--pay">{"Settle"}</button>
                         </div>
                     }
                 } else {

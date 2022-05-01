@@ -61,10 +61,14 @@ $purchaseDescriptionColor: $subtleColor;
 $purchasePriceColor: $foamColor;
 $purchaseMarkAsPaidButtonColor: $pineColor;
 $purchaseMarkAsPaidButtonTextColor: $textColor;
+$buyerMarkAsPaidButtonColor: $goldColor;
+$buyerMarkAsPaidButtonTextColor: $baseColor;
 $paidBadgeBackgroundColor: $pineColor;
 $paidBadgeTextColor: $textColor;
 $unpaidBadgeBackgroundColor: $loveColor;
 $unpaidBadgeTextColor: $baseColor;
+$countBadgeBackgroundColor: $goldColor;
+$countBadgeTextColor: $baseColor;
 
 // Dialog
 $dialogBackdropColor: transparentize($overlayColor, 0.4);

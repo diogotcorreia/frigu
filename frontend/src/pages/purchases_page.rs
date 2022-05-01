@@ -11,8 +11,8 @@ pub fn purchases_page() -> Html {
         <>
             <Navbar />
             <main>
-              <PurchasesList />
-              <SellerSummary />
+                <SellerSummary />
+                <PurchasesList />
             </main>
             <Footer />
         </>

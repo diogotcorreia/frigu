@@ -1,30 +1,30 @@
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
 
-use crate::{api, components::purchase::purchase_item::PurchaseItem};
+use crate::{api, components::purchase::buyer_grouped_purchases::BuyerGroupedPurchases};
 
 #[function_component(SellerSummary)]
 pub fn seller_summary() -> Html {
-    let purchases = use_state(|| None);
+    let buyers = use_state(|| None);
 
     let refresh_purchases = {
-        let purchases = purchases.clone();
+        let buyers = buyers.clone();
         Callback::<()>::from(move |_| {
-            let purchases = purchases.clone();
+            let buyers = buyers.clone();
             spawn_local(async move {
                 match api::seller_summary().await {
-                    Ok(purchases_list) => purchases.set(Some(purchases_list)),
-                    Err(_error) => purchases.set(None), // TODO handle error
+                    Ok(buyers_list) => buyers.set(Some(buyers_list)),
+                    Err(_error) => buyers.set(None), // TODO handle error
                 };
             });
         })
     };
 
     {
-        let purchases = purchases.clone();
+        let buyers = buyers.clone();
         let refresh_purchases = refresh_purchases.clone();
         use_effect(move || {
-            if purchases.is_none() {
+            if buyers.is_none() {
                 refresh_purchases.emit(());
             }
 
@@ -40,19 +40,18 @@ pub fn seller_summary() -> Html {
             <div class="card-content">
                 <div class="purchases-list">
                     {
-                        if let Some(purchases_list) = &*purchases {
-                            if purchases_list.is_empty() {
+                        if let Some(buyers) = &*buyers {
+                            if buyers.is_empty() {
                                 html! {
                                     <p>{"You haven't sold any products yet"}</p>
                                 }
                             } else {
-                                purchases_list.iter()
-                                    .map(|purchase| {
+                                buyers.iter()
+                                    .map(|buyer| {
                                         html! {
-                                            <PurchaseItem
-                                                key={purchase.id}
-                                                is_seller={true}
-                                                purchase={purchase.clone()}
+                                            <BuyerGroupedPurchases
+                                                key={buyer.buyer.id}
+                                                grouped_purchases={buyer.clone()}
                                                 on_update={&refresh_purchases}
                                             />
                                         }

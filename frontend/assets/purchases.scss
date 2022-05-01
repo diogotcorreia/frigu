@@ -16,6 +16,7 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+  flex-wrap: wrap;
   
   &:not(:last-of-type) {
     border-bottom: 1px solid $purchaseItemSeparatorColor;
@@ -25,6 +26,8 @@
     flex-grow: 1;
 
     .purchase-info--name {
+      @include flex($justifyContent: flex-start);
+      flex-wrap: wrap;
       font-weight: bold;
       font-size: 1.2em;
       color: $purchaseNameColor;
@@ -64,13 +67,58 @@
     color: $purchasePriceColor;
     font-weight: bold;
     font-size: 1.3em;
-    margin: 0 spacing(2);
+    margin: spacing(1) spacing(2);
   }
 }
 
 .purchase-actions {
+  margin: spacing(1) 0;
   .purchase-actions--pay {
     background-color: $purchaseMarkAsPaidButtonColor;
     color: $purchaseMarkAsPaidButtonTextColor;
+  }
+}
+
+.grouped-buyer-item {
+  margin: spacing(4) 0;
+
+  .buyer-info {
+    @include flex;
+
+    .buyer-info--name {
+      flex-grow: 1;
+
+      font-weight: bold;
+      font-size: 1.4em;
+      color: $purchaseNameColor;
+
+      .buyer-info--count-badge {
+        margin-left: spacing(1);
+        font-size: 0.7em;
+        padding: spacing(0.4) spacing(1.2);
+        border-radius: $borderRadius;
+
+        background-color: $countBadgeBackgroundColor;
+        color: $countBadgeTextColor;
+      }
+    }
+
+    .buyer-info--amount-due {
+      color: $goldColor;
+      font-weight: bold;
+      font-size: 1.3em;
+      margin: 0 spacing(2);
+    }
+    
+    .buyer-info--actions {
+      .buyer-info--actions__pay {
+        background-color: $buyerMarkAsPaidButtonColor;
+        color: $buyerMarkAsPaidButtonTextColor;
+      }
+    }
+  }
+
+  .buyer-purchases {
+    margin-left: spacing(2);
   }
 }
