@@ -22,6 +22,16 @@
    ```
 6. Run `dev.sh` to start dev server
 
+### Creating User Accounts
+
+To create a user account, you can send the following request from a **loopback interface** (i.e. localhost):
+
+```bash
+curl -X POST 'http://localhost:8080/api/register' \
+  -H "Content-Type: application/json" \
+  -d '{"name": "John Doe", "phone_number": "912345678", "password": "secret"}'
+```
+
 ## Deploying
 
 A pre-built docker image is available at `ghcr.io/diogotcorreia/frigu`.
