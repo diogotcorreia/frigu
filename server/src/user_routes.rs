@@ -72,7 +72,7 @@ pub(crate) async fn register(
     }
 
     let phone_number = register_dto.phone_number;
-    if phone_number.len() != 9 || phone_number.chars().all(|c| c.is_digit(10)) {
+    if !(phone_number.len() == 9 && phone_number.chars().all(|c| c.is_digit(10))) {
         return Err(AppError::BadInput("phone number must be 9 digits long"));
     }
 
