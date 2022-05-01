@@ -40,21 +40,4 @@ impl Related<super::purchase::Entity> for Entity {
     }
 }
 
-impl ActiveModelBehavior for ActiveModel {
-    // Will be triggered before insert / update
-    fn before_save(self, insert: bool) -> Result<Self, DbErr> {
-        if self.price.as_ref() < &0 {
-            Err(DbErr::Custom(format!(
-                "[before_save] Price cannot be negative, insert: {}",
-                insert
-            )))
-        } else if self.stock.as_ref() < &0 {
-            Err(DbErr::Custom(format!(
-                "[before_save] Stock cannot be negative, insert: {}",
-                insert
-            )))
-        } else {
-            Ok(self)
-        }
-    }
-}
+impl ActiveModelBehavior for ActiveModel {}

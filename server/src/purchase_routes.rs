@@ -8,7 +8,8 @@ use entity::{
     sea_orm, user,
 };
 use sea_orm::{
-    prelude::*, DatabaseConnection, JoinType, QueryOrder, QuerySelect, Set, TransactionTrait,
+    prelude::*, DatabaseConnection, FromQueryResult, JoinType, QueryOrder, QuerySelect, Set,
+    TransactionTrait, Unchanged,
 };
 
 use crate::dtos::{BuyerGroupedPurchasesDto, PurchaseDto, SellerSummaryDto};
@@ -37,18 +38,14 @@ pub(crate) async fn seller_summary(
     // Grouped amount due per user
     let buyer_grouped_purchases: Vec<BuyerGroupedPurchasesDto> = dtos
         .iter()
-        .fold(HashMap::new(), |mut acc, purchase| {
-            let buyer_id = purchase.buyer.as_ref().expect("buyer must exist").id;
-            match acc.get_mut(&buyer_id) {
-                None => {
-                    acc.insert(buyer_id, vec![purchase]);
-                }
-                Some(vec) => {
-                    vec.push(purchase);
-                }
-            };
-            acc
-        })
+        .fold(
+            HashMap::new(),
+            |mut acc: HashMap<u32, Vec<&PurchaseDto>>, purchase| {
+                let buyer_id = purchase.buyer.as_ref().expect("buyer must exist").id;
+                acc.entry(buyer_id).or_insert(Vec::new()).push(purchase);
+                acc
+            },
+        )
         .iter()
         .map(|(_, buyer_purchases)| {
             let amount_due: u32 = buyer_purchases
@@ -97,28 +94,46 @@ pub(crate) async fn purchase_history(
     Ok(Json(dtos))
 }
 
+#[derive(Debug, FromQueryResult)]
+struct PurchaseWithSeller {
+    id: u32,
+    seller_id: u32,
+    paid_date: Option<DateTimeUtc>,
+}
+
 pub(crate) async fn pay_purchase(
     Path(purchase_id): Path<u32>,
     Extension(ref conn): Extension<DatabaseConnection>,
     jar: CookieJar,
 ) -> Result<(), AppError> {
-    let _seller_id = crate::jwt_helpers::get_login(&jar)?;
+    let seller_id = crate::jwt_helpers::get_login(&jar)?;
 
     let txn = conn.begin().await?;
 
     let purchase = Purchase::find_by_id(purchase_id)
-        .one(conn)
+        .column_as(product::Column::Seller, "seller_id")
+        .join(JoinType::InnerJoin, purchase::Relation::Product.def())
+        .into_model::<PurchaseWithSeller>()
+        .one(&txn)
         .await?
         .ok_or(AppError::NoSuchPurchase)?;
 
-    let mut purchase: purchase::ActiveModel = purchase.into();
+    if purchase.seller_id != seller_id {
+        return Err(AppError::Forbidden);
+    }
+    if purchase.paid_date.is_some() {
+        return Err(AppError::PurchaseAlreadyPaid);
+    }
 
     let now = chrono::offset::Utc::now();
-    purchase.paid_date = Set(Some(now));
+    let purchase = purchase::ActiveModel {
+        id: Unchanged(purchase.id),
+        paid_date: Set(Some(now)),
+        ..Default::default()
+    };
 
-    purchase.update(conn).await?;
+    purchase.save(&txn).await?;
 
-    // TODO check if seller_id matches the product seller
     txn.commit().await?;
     Ok(())
 }

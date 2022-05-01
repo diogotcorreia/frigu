@@ -13,7 +13,9 @@ pub(crate) enum AppError {
     NoSuchProduct,
     NoSuchPurchase,
     NotEnoughStock,
+    PurchaseAlreadyPaid,
     Unauthorized,
+    Forbidden,
     JwtError(jwt::error::Error),
     PwhError(PwHashError),
     DbError(DbErr),
@@ -27,6 +29,9 @@ impl IntoResponse for AppError {
             AppError::NoSuchProduct => (StatusCode::NOT_FOUND, "no such product"),
             AppError::NoSuchPurchase => (StatusCode::NOT_FOUND, "no such purchase"),
             AppError::NotEnoughStock => (StatusCode::CONFLICT, "not enough stock"),
+            AppError::PurchaseAlreadyPaid => {
+                (StatusCode::CONFLICT, "purchase has already been paid")
+            }
             AppError::PwhError(PwHashError::Password) => {
                 (StatusCode::UNAUTHORIZED, "wrong password")
             }
@@ -36,6 +41,7 @@ impl IntoResponse for AppError {
             // TODO: how to clear jar **and** return StatusCode?
             // maybe UNAUTHORIZED redirects to login page?
             AppError::Unauthorized => (StatusCode::UNAUTHORIZED, "login required"),
+            AppError::Forbidden => (StatusCode::FORBIDDEN, "not allowed to access this"),
         };
 
         let body = Json(json!({
