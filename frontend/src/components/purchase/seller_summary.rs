@@ -1,49 +1,42 @@
-use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
+use yew_hooks::{use_async_with_options, UseAsyncOptions};
 
-use crate::{api, components::purchase::buyer_grouped_purchases::BuyerGroupedPurchases};
+use crate::{
+    api, components::purchase::buyer_grouped_purchases::BuyerGroupedPurchases, utils::class_if,
+};
 
 #[function_component(SellerSummary)]
 pub fn seller_summary() -> Html {
-    let buyers = use_state(|| None);
+    let buyers = use_async_with_options(
+        async move { api::seller_summary().await },
+        UseAsyncOptions::enable_auto(),
+    );
 
     let refresh_purchases = {
         let buyers = buyers.clone();
         Callback::<()>::from(move |_| {
-            let buyers = buyers.clone();
-            spawn_local(async move {
-                match api::seller_summary().await {
-                    Ok(buyers_list) => buyers.set(Some(buyers_list)),
-                    Err(_error) => buyers.set(None), // TODO handle error
-                };
-            });
+            buyers.run();
         })
     };
 
-    {
-        let buyers = buyers.clone();
-        let refresh_purchases = refresh_purchases.clone();
-        use_effect(move || {
-            if buyers.is_none() {
-                refresh_purchases.emit(());
-            }
-
-            || {}
-        })
-    }
-
     html! {
-        <div class="card purchases-card">
+        <div class={classes!("card", "purchases-card", class_if(buyers.loading, "card-loading"))}>
+            <div class="loading-bar" />
+            {
+                buyers.error.as_ref().map_or_else(|| html!{}, |error| html! {
+                    <div class="card-error">{error}</div>
+                })
+            }
             <div class="card-header">
                 {"Products Sold"}
             </div>
             <div class="card-content">
                 <div class="purchases-list">
                     {
-                        if let Some(buyers) = &*buyers {
+                        buyers.data.as_ref().map_or_else(|| html!{}, |buyers| {
                             if buyers.is_empty() {
                                 html! {
-                                    <p>{"You haven't sold any products yet"}</p>
+                                    <p>{"You don't have any purchases to settle"}</p>
                                 }
                             } else {
                                 buyers.iter()
@@ -58,11 +51,7 @@ pub fn seller_summary() -> Html {
                                     })
                                     .collect()
                             }
-                        } else {
-                            html! {
-                                <p>{"Loading..."}</p>
-                            }
-                        }
+                        })
                     }
                 </div>
             </div>

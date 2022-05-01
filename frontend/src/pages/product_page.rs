@@ -38,7 +38,7 @@ pub fn product_page() -> Html {
                     <div class="card-content">
                         <div class="product-list">
                             {
-                                if let Some(product_list) = &products.data {
+                                products.data.as_ref().map_or_else(|| html!{}, |product_list| {
                                     if product_list.is_empty() {
                                         html! {
                                             <p>{"There are no products in stock"}</p>
@@ -56,9 +56,7 @@ pub fn product_page() -> Html {
                                             })
                                             .collect()
                                     }
-                                } else {
-                                    html! { }
-                                }
+                                })
                             }
                         </div>
                     </div>

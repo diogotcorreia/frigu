@@ -99,8 +99,7 @@ pub async fn insert_product(product: &ProductPayload) -> Result<Product, ApiErro
         .json(product)
         .expect("payload must be serializable to json")
         .send()
-        .await
-        .unwrap();
+        .await?;
 
     handle_response(resp).await
 }
@@ -118,10 +117,9 @@ pub async fn purchase_product(
         .json(payload)
         .expect("payload must be serializable to json")
         .send()
-        .await
-        .unwrap();
+        .await?;
 
-    handle_response(resp).await
+    handle_blank_response(resp).await
 }
 
 #[derive(Serialize, Deserialize)]
@@ -135,8 +133,7 @@ pub async fn login(credentials: &LoginPayload) -> Result<(), ApiError> {
         .json(credentials)
         .expect("payload must be serializable to json")
         .send()
-        .await
-        .unwrap();
+        .await?;
 
     handle_blank_response(resp).await
 }
@@ -149,13 +146,13 @@ pub struct User {
 }
 
 pub async fn user_info() -> Result<User, ApiError> {
-    let resp = Request::get("/api/user/info").send().await.unwrap();
+    let resp = Request::get("/api/user/info").send().await?;
 
     handle_response(resp).await
 }
 
 pub async fn logout() -> Result<(), ApiError> {
-    let resp = Request::get("/api/logout").send().await.unwrap();
+    let resp = Request::get("/api/logout").send().await?;
 
     handle_blank_response(resp).await
 }
@@ -179,16 +176,13 @@ pub struct BuyerGroupedPurchases {
 }
 
 pub async fn list_purchases() -> Result<Vec<Purchase>, ApiError> {
-    let resp = Request::get("/api/purchases/history").send().await.unwrap();
+    let resp = Request::get("/api/purchases/history").send().await?;
 
     handle_response(resp).await
 }
 
 pub async fn seller_summary() -> Result<Vec<BuyerGroupedPurchases>, ApiError> {
-    let resp = Request::get("/api/purchases/seller-summary")
-        .send()
-        .await
-        .unwrap();
+    let resp = Request::get("/api/purchases/seller-summary").send().await?;
 
     handle_response(resp).await
 }
@@ -196,10 +190,9 @@ pub async fn seller_summary() -> Result<Vec<BuyerGroupedPurchases>, ApiError> {
 pub async fn pay_purchase(purchase_id: u32) -> Result<(), ApiError> {
     let resp = Request::post(&format!("/api/purchase/{}/pay", purchase_id))
         .send()
-        .await
-        .unwrap();
+        .await?;
 
-    handle_response(resp).await
+    handle_blank_response(resp).await
 }
 
 #[derive(Serialize)]
@@ -214,8 +207,7 @@ pub async fn pay_purchase_user_bulk(buyer_id: u32, purchase_count: u32) -> Resul
         })
         .expect("payload must be serializable to json")
         .send()
-        .await
-        .unwrap();
+        .await?;
 
-    handle_response(resp).await
+    handle_blank_response(resp).await
 }
