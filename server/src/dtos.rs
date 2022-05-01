@@ -45,7 +45,7 @@ pub struct LoginDto {
     pub(crate) password: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct UserDto {
     pub(crate) id: u32,
     pub(crate) name: String,
@@ -96,4 +96,16 @@ impl PurchaseDto {
             paid_date: entity.paid_date,
         })
     }
+}
+
+#[derive(Serialize)]
+pub(crate) struct BuyerGroupedPurchasesDto {
+    pub(crate) buyer: UserDto,
+    pub(crate) amount_due: u32,
+    pub(crate) purchases: Vec<PurchaseDto>,
+}
+
+#[derive(Deserialize)]
+pub(crate) struct PayPurchaseUserBulkDto {
+    pub(crate) count: u64,
 }
