@@ -17,4 +17,31 @@
 
     @include flex($justifyContent: flex-end);
   }
+
+  .card-error {
+    border-radius: $cardBorderRadius;
+    padding: spacing(1.5) spacing(2);
+    margin-bottom: spacing(1);
+
+    background-color: $cardErrorBackgroundColor;
+  }
+}
+
+.card-loading {
+  position: relative;
+
+  .loading-bar {
+    @include loading-bar;
+    
+    width: unset;
+    position: absolute;
+    top: spacing(0.5);
+    left: spacing(0.5);
+    right: spacing(0.5);
+    border-radius: $cardBorderRadius;
+
+    &::after {
+      border-radius: $cardBorderRadius;
+    }
+  }
 }

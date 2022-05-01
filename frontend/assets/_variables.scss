@@ -27,6 +27,11 @@ $textColor: $textColor;
 $linkColor: $foamColor;
 $fabBackgroundColor: $loveColor;
 
+$loadingBarColor: $irisColor;
+
+$primaryButtonColor: $irisColor;
+$primaryButtonTextColor: $baseColor;
+
 // Navbar settings
 $navbarBackground: $surfaceColor;
 $navbarLinkColor: $subtleColor;
@@ -37,6 +42,7 @@ $navbarLinkBorderRadius: $borderRadius;
 // Cards
 $cardBackground: $surfaceColor;
 $cardBorderRadius: $borderRadius;
+$cardErrorBackgroundColor: transparentize($loveColor, 0.3);
 
 // Products
 $productItemSeparatorColor: $highlightMedColor;

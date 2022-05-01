@@ -4,6 +4,7 @@ use chrono::{DateTime, Local};
 use gloo_net::http::{Request, Response};
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 
+#[derive(Clone)]
 pub enum ApiError {
     ConnectionError,
     HttpBadRequest(String),
@@ -40,21 +41,30 @@ async fn handle_response<T: DeserializeOwned>(response: Response) -> Result<T, A
     if response.ok() {
         response.json().await.map_err(|_| ApiError::JsonError)
     } else {
-        let error_message = response
-            .text()
-            .await
-            .map_err(|_| ApiError::GenericError("failed to parse response text".to_string()))?;
+        Err(error_from_response(&response).await)
+    }
+}
 
-        let error = match response.status() {
+async fn handle_blank_response(response: Response) -> Result<(), ApiError> {
+    if response.ok() {
+        Ok(())
+    } else {
+        Err(error_from_response(&response).await)
+    }
+}
+
+async fn error_from_response(response: &Response) -> ApiError {
+    let error_message = response.text().await;
+    match error_message {
+        Ok(error_message) => match response.status() {
             400 => ApiError::HttpBadRequest(error_message),
             401 => ApiError::HttpUnauthorized(error_message),
             403 => ApiError::HttpForbidden(error_message),
             404 => ApiError::HttpNotFound(error_message),
             409 => ApiError::HttpConflict(error_message),
             _ => ApiError::GenericError(error_message),
-        };
-
-        Err(error)
+        },
+        Err(_) => ApiError::GenericError("failed to parse response text".to_string()),
     }
 }
 
@@ -128,7 +138,7 @@ pub async fn login(credentials: &LoginPayload) -> Result<(), ApiError> {
         .await
         .unwrap();
 
-    handle_response(resp).await
+    handle_blank_response(resp).await
 }
 
 #[derive(Clone, Deserialize, PartialEq)]
@@ -147,11 +157,7 @@ pub async fn user_info() -> Result<User, ApiError> {
 pub async fn logout() -> Result<(), ApiError> {
     let resp = Request::get("/api/logout").send().await.unwrap();
 
-    if resp.ok() {
-        Ok(())
-    } else {
-        Err(ApiError::ConnectionError)
-    }
+    handle_blank_response(resp).await
 }
 
 #[derive(Clone, Deserialize, PartialEq)]

@@ -8,6 +8,7 @@ use sea_orm::error::DbErr;
 pub(crate) enum AppError {
     BadInput(&'static str),
     NoSuchUser,
+    LoginError,
     DuplicateUser,
     NoSuchProduct,
     NoSuchPurchase,
@@ -37,7 +38,7 @@ impl IntoResponse for AppError {
                 StatusCode::CONFLICT,
                 "affected count is different than expected",
             ),
-            AppError::PwhError(PwHashError::Password) => {
+            AppError::PwhError(PwHashError::Password) | AppError::LoginError => {
                 (StatusCode::UNAUTHORIZED, "wrong password")
             }
             AppError::PwhError(_) | AppError::DbError(_) | AppError::JwtError(_) => {

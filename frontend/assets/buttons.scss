@@ -14,6 +14,11 @@
     width: 100%;
     box-sizing: border-box;
   }
+
+  &.btn--primary {
+    background-color: $primaryButtonColor;
+    color: $primaryButtonTextColor;
+  }
 }
 
 .fab {
