@@ -1,0 +1,7 @@
+dist/
+docker-mysql/
+.env
+dev.sh
+
+**/target/
+**/Cargo.lock
