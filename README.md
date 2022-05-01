@@ -44,6 +44,7 @@ version: "3"
 services:
   frigu:
     image: ghcr.io/diogotcorreia/frigu:0
+    restart: unless-stopped
     ports:
       - 127.0.0.1:8080:8080
     environment:
@@ -52,6 +53,7 @@ services:
       - db
   db:
     image: mariadb
+    restart: unless-stopped
     environment:
       MARIADB_RANDOM_ROOT_PASSWORD: yes
       MARIADB_USER: frigu
