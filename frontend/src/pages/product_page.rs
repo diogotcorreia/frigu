@@ -10,16 +10,25 @@ use crate::{
 pub fn product_page() -> Html {
     let products = use_state(|| None);
 
+    let refresh_products = {
+        let products = products.clone();
+        Callback::<()>::from(move |_| {
+            let products = products.clone();
+            spawn_local(async move {
+                match api::list_products().await {
+                    Ok(product_list) => products.set(Some(product_list)),
+                    Err(_error) => products.set(None), // TODO handle error
+                };
+            });
+        })
+    };
+
     {
         let products = products.clone();
+        let refresh_products = refresh_products.clone();
         use_effect(move || {
             if products.is_none() {
-                spawn_local(async move {
-                    match api::list_products().await {
-                        Ok(product_list) => products.set(Some(product_list)),
-                        Err(_error) => products.set(None), // TODO handle error
-                    };
-                })
+                refresh_products.emit(());
             }
 
             || {}
@@ -49,6 +58,7 @@ pub fn product_page() -> Html {
                                                     <ProductItem
                                                         key={product.id}
                                                         product={product.clone()}
+                                                        on_update={&refresh_products}
                                                     />
                                                 }
                                             })

@@ -11,7 +11,10 @@ pub(crate) enum AppError {
     BadInput(&'static str),
     NoSuchUser,
     NoSuchProduct,
+    NoSuchPurchase,
     NotEnoughStock,
+    PurchaseAlreadyPaid,
+    BulkCountMismatch,
     Unauthorized,
     Forbidden,
     JwtError(jwt::error::Error),
@@ -25,17 +28,25 @@ impl IntoResponse for AppError {
             AppError::BadInput(message) => (StatusCode::BAD_REQUEST, message),
             AppError::NoSuchUser => (StatusCode::BAD_REQUEST, "no such user"),
             AppError::NoSuchProduct => (StatusCode::NOT_FOUND, "no such product"),
+            AppError::NoSuchPurchase => (StatusCode::NOT_FOUND, "no such purchase"),
             AppError::NotEnoughStock => (StatusCode::CONFLICT, "not enough stock"),
+            AppError::PurchaseAlreadyPaid => {
+                (StatusCode::CONFLICT, "purchase has already been paid")
+            }
+            AppError::BulkCountMismatch => (
+                StatusCode::CONFLICT,
+                "affected count is different than expected",
+            ),
             AppError::PwhError(PwHashError::Password) => {
                 (StatusCode::UNAUTHORIZED, "wrong password")
             }
             AppError::PwhError(_) | AppError::DbError(_) | AppError::JwtError(_) => {
                 (StatusCode::INTERNAL_SERVER_ERROR, "internal servor error")
             }
-            AppError::Forbidden => (StatusCode::FORBIDDEN, "admin only"),
             // TODO: how to clear jar **and** return StatusCode?
             // maybe UNAUTHORIZED redirects to login page?
             AppError::Unauthorized => (StatusCode::UNAUTHORIZED, "login required"),
+            AppError::Forbidden => (StatusCode::FORBIDDEN, "not allowed to access this"),
         };
 
         let body = Json(json!({

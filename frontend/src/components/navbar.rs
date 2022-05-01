@@ -14,7 +14,7 @@ pub fn navbar() -> Html {
             </h1>
             <div class="nav-links">
                 <Link<Route> to={Route::ProductPage} classes={classes!(class_if(active_route == Route::ProductPage, "active"))}>{"Products"}</Link<Route>>
-                <a href="/my-transactions">{"Transactions"}</a>
+                <Link<Route> to={Route::PurchasesPage} classes={classes!(class_if(active_route == Route::PurchasesPage, "active"))}>{"Purchases"}</Link<Route>>
             </div>
         </header>
     }

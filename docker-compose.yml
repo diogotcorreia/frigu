@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  frigu:
+    image: ghcr.io/diogotcorreia/frigu:0
+    ports:
+      - 127.0.0.1:8080:8080
+    environment:
+      - DATABASE_URL=mysql://frigu:frigu@db/frigu
+    depends_on:
+      - db
+  db:
+    image: mariadb
+    environment:
+      MARIADB_RANDOM_ROOT_PASSWORD: yes
+      MARIADB_USER: frigu
+      MARIADB_PASSWORD: frigu
+      MARIADB_DATABASE: frigu
+    volumes:
+      - frigu-data:/var/lib/mysql
+
+volumes:
+  frigu-data:

@@ -1,9 +1,11 @@
-use axum::{extract::{self, Path}, Extension, Json};
+use axum::{
+    extract::{self, Path},
+    Extension, Json,
+};
 use axum_extra::extract::CookieJar;
 use entity::{
     product::{self, Entity as Product},
-    purchase,
-    sea_orm,
+    purchase, sea_orm,
 };
 use sea_orm::{prelude::*, DatabaseConnection, QueryOrder, Set, TransactionTrait};
 
@@ -76,13 +78,13 @@ pub(crate) async fn purchase(
     Json(purchase_dto): Json<PurchaseDto>,
     Extension(ref conn): Extension<DatabaseConnection>,
     jar: CookieJar,
-    ) -> Result<(), AppError> {
+) -> Result<(), AppError> {
     let buyer_id = crate::jwt_helpers::get_login(&jar)?;
 
     let txn = conn.begin().await?;
 
-    let mut product = Product::find_by_id(product_id)
-        .one(conn)
+    let product = Product::find_by_id(product_id)
+        .one(&txn)
         .await?
         .ok_or(AppError::NoSuchProduct)?;
 
@@ -100,9 +102,13 @@ pub(crate) async fn purchase(
         date: Set(now),
         ..Default::default()
     };
-    purchase.insert(conn).await?;
+    purchase.insert(&txn).await?;
 
-    product.stock -= purchase_dto.quantity;
+    let mut product: product::ActiveModel = product.into();
+    product.stock =
+        Set(product.stock.take().expect("product must have stock") - purchase_dto.quantity);
+
+    product.update(&txn).await?;
 
     txn.commit().await?;
     Ok(())
