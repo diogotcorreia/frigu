@@ -1,0 +1,129 @@
+.purchases-card {
+  width: 90%;
+  max-width: 600px;
+}
+
+.purchases-list {
+  @include flex($alignItems: stretch, $justifyContent: flex-start);
+  flex-direction: column;
+  
+  overflow-y: auto;
+}
+
+.purchase-item {
+  padding: spacing(2) 0;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  
+  &:not(:last-of-type) {
+    border-bottom: 1px solid $purchaseItemSeparatorColor;
+  }
+
+  .purchase-info {
+    flex-grow: 1;
+
+    .purchase-info--name {
+      @include flex($justifyContent: flex-start);
+      flex-wrap: wrap;
+      font-weight: bold;
+      font-size: 1.2em;
+      color: $purchaseNameColor;
+
+      .purchase-info--paid-badge {
+        margin-left: spacing(1);
+        font-size: 0.7em;
+        padding: spacing(0.4) spacing(1.2);
+        border-radius: $borderRadius;
+
+        background-color: $paidBadgeBackgroundColor;
+        color: $paidBadgeTextColor;
+
+        &.purchase-info--paid-badge__unpaid {
+          background-color: $unpaidBadgeBackgroundColor;
+          color: $unpaidBadgeTextColor;
+        }
+      }
+    }
+    
+    .purchase-info--metadata {
+      font-size: 1.1em;
+      color: $purchaseMetadataColor;
+
+      .purchase-info--quantity {
+        color: $purchaseNameColor;
+        font-weight: bold;
+      }
+    }
+    
+    .purchase-info--date, .purchase-info--paid-date {
+      color: $purchaseDateColor;
+      font-size: 0.9em;
+    }
+    
+    .purchase-info--description {
+      color: $purchaseDescriptionColor;
+    }
+  }
+
+  .purchase-price {
+    color: $purchasePriceColor;
+    font-weight: bold;
+    font-size: 1.3em;
+    margin: spacing(1) spacing(2);
+  }
+}
+
+.purchase-actions {
+  margin: spacing(1) 0;
+  .purchase-actions--pay {
+    background-color: $purchaseMarkAsPaidButtonColor;
+    color: $purchaseMarkAsPaidButtonTextColor;
+  }
+}
+
+.grouped-buyer-item {
+  margin: spacing(4) 0;
+
+  .buyer-info {
+    @include flex;
+
+    .buyer-info--name {
+      flex-grow: 1;
+
+      font-weight: bold;
+      font-size: 1.4em;
+      color: $purchaseNameColor;
+
+      .buyer-info--count-badge {
+        margin-left: spacing(1);
+        font-size: 0.7em;
+        padding: spacing(0.4) spacing(1.2);
+        border-radius: $borderRadius;
+
+        background-color: $countBadgeBackgroundColor;
+        color: $countBadgeTextColor;
+      }
+    }
+
+    .buyer-info--amount-due {
+      color: $goldColor;
+      font-weight: bold;
+      font-size: 1.3em;
+      margin: 0 spacing(2);
+    }
+    
+    .buyer-info--actions {
+      .buyer-info--actions__pay {
+        background-color: $buyerMarkAsPaidButtonColor;
+        color: $buyerMarkAsPaidButtonTextColor;
+      }
+    }
+  }
+
+  .buyer-purchases {
+    margin-left: spacing(2);
+  }
+}

@@ -1,3 +1,4 @@
+use chrono::{DateTime, Local};
 use gloo_net::http::Request;
 use serde::{Deserialize, Serialize};
 
@@ -101,11 +102,10 @@ pub async fn login(credentials: &LoginPayload) -> Result<(), ApiError> {
     }
 }
 
-#[derive(Deserialize, Clone)]
+#[derive(Clone, Deserialize, PartialEq)]
 pub struct User {
     pub id: u32,
     pub name: String,
-
     pub phone_number: String,
 }
 
@@ -122,6 +122,82 @@ pub async fn user_info() -> Result<User, ApiError> {
 
 pub async fn logout() -> Result<(), ApiError> {
     let resp = Request::get("/api/logout").send().await.unwrap();
+
+    if resp.ok() {
+        Ok(())
+    } else {
+        Err(ApiError::ConnectionError)
+    }
+}
+
+#[derive(Clone, Deserialize, PartialEq)]
+pub struct Purchase {
+    pub id: u32,
+    pub buyer: User,
+    pub product: Product,
+    pub quantity: u32,
+    pub unit_price: u32,
+    pub date: DateTime<Local>,
+    pub paid_date: Option<DateTime<Local>>,
+}
+
+#[derive(Clone, Deserialize, PartialEq)]
+pub struct BuyerGroupedPurchases {
+    pub buyer: User,
+    pub amount_due: u32,
+    pub purchases: Vec<Purchase>,
+}
+
+pub async fn list_purchases() -> Result<Vec<Purchase>, ApiError> {
+    let resp = Request::get("/api/purchases/history").send().await.unwrap();
+
+    if resp.ok() {
+        Ok(resp.json().await.unwrap())
+    } else {
+        Err(ApiError::ConnectionError)
+    }
+}
+
+pub async fn seller_summary() -> Result<Vec<BuyerGroupedPurchases>, ApiError> {
+    let resp = Request::get("/api/purchases/seller-summary")
+        .send()
+        .await
+        .unwrap();
+
+    if resp.ok() {
+        Ok(resp.json().await.unwrap())
+    } else {
+        Err(ApiError::ConnectionError)
+    }
+}
+
+pub async fn pay_purchase(purchase_id: u32) -> Result<(), ApiError> {
+    let resp = Request::post(&format!("/api/purchase/{}/pay", purchase_id))
+        .send()
+        .await
+        .unwrap();
+
+    if resp.ok() {
+        Ok(())
+    } else {
+        Err(ApiError::ConnectionError)
+    }
+}
+
+#[derive(Serialize)]
+struct PayPurchaseUserBulkPayload {
+    count: u32,
+}
+
+pub async fn pay_purchase_user_bulk(buyer_id: u32, purchase_count: u32) -> Result<(), ApiError> {
+    let resp = Request::post(&format!("/api/purchase/user/{}/pay", buyer_id))
+        .json(&PayPurchaseUserBulkPayload {
+            count: purchase_count,
+        })
+        .expect("payload must be serializable to json")
+        .send()
+        .await
+        .unwrap();
 
     if resp.ok() {
         Ok(())
