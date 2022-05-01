@@ -1,3 +1,4 @@
+use chrono::{DateTime, Local};
 use gloo_net::http::Request;
 use serde::{Deserialize, Serialize};
 
@@ -136,9 +137,8 @@ pub struct Purchase {
     pub product: Product,
     pub quantity: u32,
     pub unit_price: u32,
-    // TODO how to represent dates?
-    pub date: String,
-    pub paid_date: Option<String>,
+    pub date: DateTime<Local>,
+    pub paid_date: Option<DateTime<Local>>,
 }
 
 #[derive(Clone, Deserialize, PartialEq)]

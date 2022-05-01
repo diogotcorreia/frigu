@@ -3,7 +3,7 @@ use yew::prelude::*;
 
 use crate::{
     api,
-    utils::{self, class_if},
+    utils::{self, class_if, format_datetime},
 };
 
 #[derive(Clone, Properties, PartialEq)]
@@ -64,6 +64,15 @@ pub fn purchase_item(props: &PurchaseItemProps) -> Html {
                         }
                     }
                 </div>
+                <div class="purchase-info--date">{format!("At {}", format_datetime(purchase.date.clone()))}</div>
+                {
+                    match purchase.paid_date {
+                        Some(date) => html! {
+                            <div class="purchase-info--paid-date">{format!("Paid at {}", format_datetime(date.clone()))}</div>
+                        },
+                        None => html! {}
+                    }
+                }
                 <div class="purchase-info--description">{purchase.product.description.as_ref().unwrap_or(&String::new())}</div>
             </div>
             <div class="purchase-price">

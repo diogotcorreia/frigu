@@ -58,6 +58,11 @@
       }
     }
     
+    .purchase-info--date, .purchase-info--paid-date {
+      color: $purchaseDateColor;
+      font-size: 0.9em;
+    }
+    
     .purchase-info--description {
       color: $purchaseDescriptionColor;
     }
