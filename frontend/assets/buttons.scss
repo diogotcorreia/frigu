@@ -19,6 +19,11 @@
     background-color: $primaryButtonColor;
     color: $primaryButtonTextColor;
   }
+
+  &:disabled {
+    opacity: 60%;
+    cursor: default;
+  }
 }
 
 .fab {

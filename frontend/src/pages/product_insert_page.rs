@@ -83,7 +83,7 @@ pub fn product_insert_page() -> Html {
                             <label for="product--price">{"Price (cents) (*)"}</label>
                             <input ref={price_ref} type="number" min={0} id="product--price" />
 
-                            <button type="submit" class="btn btn--full-width">{"Create"}</button>
+                            <button type="submit" disabled={state.loading} class="btn btn--full-width">{"Create"}</button>
                         </form>
                     </div>
                 </div>

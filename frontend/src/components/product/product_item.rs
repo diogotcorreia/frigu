@@ -1,14 +1,17 @@
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
 
-use crate::components::{
-    dialog::Dialog,
-    product::{
-        product_purchase_complete_dialog::ProductPurchaseCompleteDialog,
-        product_purchase_dialog::ProductPurchaseDialog,
+use crate::{api, utils};
+use crate::{
+    api::ApiError,
+    components::{
+        dialog::Dialog,
+        product::{
+            product_purchase_complete_dialog::ProductPurchaseCompleteDialog,
+            product_purchase_dialog::ProductPurchaseDialog,
+        },
     },
 };
-use crate::{api, utils};
 
 #[derive(Clone, Properties, PartialEq)]
 pub struct ProductItemProps {
@@ -22,7 +25,7 @@ pub fn product_item(props: &ProductItemProps) -> Html {
 
     let buy_click_handler = {
         let flow_state = flow_state.clone();
-        Callback::from(move |_| flow_state.set(PurchaseFlow::SelectingQuantity))
+        Callback::from(move |_| flow_state.set(PurchaseFlow::SelectingQuantity(false)))
     };
 
     let dialog_close_handler = {
@@ -37,7 +40,7 @@ pub fn product_item(props: &ProductItemProps) -> Html {
         Callback::from(move |quantity: u32| {
             let flow_state = flow_state.clone();
             let on_update = on_update.clone();
-            flow_state.set(PurchaseFlow::Loading);
+            flow_state.set(PurchaseFlow::SelectingQuantity(true));
             spawn_local(async move {
                 let payload = api::PurchaseProductPayload { quantity };
                 match api::purchase_product(product_id, &payload).await {
@@ -45,7 +48,7 @@ pub fn product_item(props: &ProductItemProps) -> Html {
                         flow_state.set(PurchaseFlow::Complete);
                         on_update.emit(());
                     }
-                    Err(_) => { /* TODO */ }
+                    Err(error) => flow_state.set(PurchaseFlow::Error(error)),
                 };
             })
         })
@@ -73,15 +76,28 @@ pub fn product_item(props: &ProductItemProps) -> Html {
                 <button onclick={buy_click_handler} class="btn product-actions--purchase">{"Buy"}</button>
             </div>
             {
-                match *flow_state {
-                    PurchaseFlow::SelectingQuantity => html! {
-                        <ProductPurchaseDialog product={product.clone()} on_close={dialog_close_handler} on_buy={dialog_buy_handler} />
+                match &*flow_state {
+                    PurchaseFlow::SelectingQuantity(loading) => html! {
+                        <ProductPurchaseDialog
+                            loading={*loading}
+                            product={product.clone()}
+                            on_close={dialog_close_handler}
+                            on_buy={dialog_buy_handler}
+                        />
                     },
-                    PurchaseFlow::Loading => html! {
+                    PurchaseFlow::Error(error) => html! {
                         <Dialog>
                             <div class="card">
                                 <div class="card-header">
-                                    {"Loading..."}
+                                    {"Error"}
+                                </div>
+                                <div class="card-error">
+                                    {error}
+                                </div>
+                                <div class="card-actions product-actions">
+                                    <button onclick={dialog_close_handler} class="btn product-actions--cancel">
+                                        {"Close"}
+                                    </button>
                                 </div>
                             </div>
                         </Dialog>
@@ -89,7 +105,7 @@ pub fn product_item(props: &ProductItemProps) -> Html {
                     PurchaseFlow::Complete => html! {
                         <ProductPurchaseCompleteDialog on_close={dialog_close_handler} />
                     },
-                    _ => html! {},
+                    PurchaseFlow::None => html! {},
                 }
             }
         </div>
@@ -98,7 +114,7 @@ pub fn product_item(props: &ProductItemProps) -> Html {
 
 pub enum PurchaseFlow {
     None,
-    SelectingQuantity,
-    Loading,
+    SelectingQuantity(bool),
+    Error(ApiError),
     Complete,
 }

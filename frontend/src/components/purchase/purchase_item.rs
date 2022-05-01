@@ -1,5 +1,5 @@
-use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
+use yew_hooks::use_async;
 
 use crate::{
     api,
@@ -16,20 +16,22 @@ pub struct PurchaseItemProps {
 #[function_component(PurchaseItem)]
 pub fn purchase_item(props: &PurchaseItemProps) -> Html {
     let purchase = &props.purchase;
-
-    let handle_mark_as_paid = {
+    let settle = {
         let on_update = props.on_update.clone();
-        let purchase_id = props.purchase.id;
+        let purchase_id = purchase.id;
+        use_async(async move {
+            let res = api::pay_purchase(purchase_id).await;
+            if res.is_ok() {
+                on_update.emit(());
+            }
+            res
+        })
+    };
+
+    let handle_settle = {
+        let settle = settle.clone();
         Callback::from(move |_| {
-            let on_update = on_update.clone();
-            spawn_local(async move {
-                match api::pay_purchase(purchase_id).await {
-                    Ok(_) => {
-                        on_update.emit(());
-                    }
-                    Err(_) => { /* TODO */ }
-                };
-            })
+            settle.run();
         })
     };
 
@@ -82,7 +84,12 @@ pub fn purchase_item(props: &PurchaseItemProps) -> Html {
                 if props.is_seller {
                     html! {
                         <div class="purchase-actions">
-                            <button onclick={handle_mark_as_paid} class="btn purchase-actions--pay">{"Settle"}</button>
+                            <button onclick={handle_settle} disabled={settle.loading} class="btn purchase-actions--pay">{"Settle"}</button>
+                            {
+                                settle.error.as_ref().map_or_else(|| html!{}, |error| html! {
+                                    <div class="purchase-actions--error">{error}</div>
+                                })
+                            }
                         </div>
                     }
                 } else {

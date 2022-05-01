@@ -82,6 +82,10 @@
     background-color: $purchaseMarkAsPaidButtonColor;
     color: $purchaseMarkAsPaidButtonTextColor;
   }
+  .purchase-actions--error {
+    margin-top: spacing(0.5);
+    color: $errorTextColor;
+  }
 }
 
 .grouped-buyer-item {
@@ -119,6 +123,10 @@
       .buyer-info--actions__pay {
         background-color: $buyerMarkAsPaidButtonColor;
         color: $buyerMarkAsPaidButtonTextColor;
+      }
+      .buyer-info--actions__error {
+        margin-top: spacing(0.5);
+        color: $errorTextColor;
       }
     }
   }

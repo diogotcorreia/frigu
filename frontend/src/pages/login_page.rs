@@ -64,7 +64,7 @@ pub fn login_page() -> Html {
                         <label for="login--password">{"Password"}</label>
                         <input ref={password_ref} type="password" id="login--password" />
 
-                        <button type="submit" class="btn btn--full-width btn--primary">{"Login"}</button>
+                        <button type="submit" disabled={state.loading} class="btn btn--full-width btn--primary">{"Login"}</button>
                     </form>
                 </div>
             </div>

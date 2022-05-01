@@ -8,7 +8,7 @@ use crate::{
 };
 
 pub fn use_auth() -> Option<User> {
-    let history = use_history().unwrap();
+    let history = use_history().expect("yew-router must be accessible");
     let user = use_state(|| None);
 
     {

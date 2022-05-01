@@ -1,9 +1,14 @@
 use yew::prelude::*;
 
-use crate::{api, components::dialog::Dialog, utils};
+use crate::{
+    api,
+    components::dialog::Dialog,
+    utils::{self, class_if},
+};
 
 #[derive(Clone, Properties, PartialEq)]
 pub struct ProductPurchaseDialogProps {
+    pub loading: bool,
     pub product: api::Product,
     pub on_close: Callback<MouseEvent>,
     pub on_buy: Callback<u32>,
@@ -33,7 +38,8 @@ pub fn product_purchase_dialog(props: &ProductPurchaseDialogProps) -> Html {
 
     html! {
         <Dialog>
-            <div class="card">
+            <div class={classes!("card", class_if(props.loading, "card-loading"))}>
+                <div class="loading-bar" />
                 <div class="card-header">
                     {format!("Purchase {}", product.name.clone())}
                 </div>
@@ -48,10 +54,10 @@ pub fn product_purchase_dialog(props: &ProductPurchaseDialogProps) -> Html {
                     </div>
                 </div>
                 <div class="card-actions product-actions">
-                    <button onclick={&props.on_close} class="btn product-actions--cancel">
+                    <button onclick={&props.on_close} disabled={props.loading} class="btn product-actions--cancel">
                         {"Cancel"}
                     </button>
-                    <button onclick={on_buy_handle} class="btn product-actions--purchase">
+                    <button onclick={on_buy_handle} disabled={props.loading} class="btn product-actions--purchase">
                         {format!("Buy for {}", utils::format_display_price(product.price * *quantity))}
                     </button>
                 </div>
