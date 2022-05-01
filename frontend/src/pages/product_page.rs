@@ -1,52 +1,44 @@
-use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
+use yew_hooks::{use_async_with_options, UseAsyncOptions};
 
 use crate::{
     api,
     components::{footer::Footer, navbar::Navbar, product::product_item::ProductItem},
+    utils::class_if,
 };
 
 #[function_component(ProductPage)]
 pub fn product_page() -> Html {
-    let products = use_state(|| None);
+    let products = use_async_with_options(
+        async move { api::list_products().await },
+        UseAsyncOptions::enable_auto(),
+    );
 
     let refresh_products = {
         let products = products.clone();
         Callback::<()>::from(move |_| {
-            let products = products.clone();
-            spawn_local(async move {
-                match api::list_products().await {
-                    Ok(product_list) => products.set(Some(product_list)),
-                    Err(_error) => products.set(None), // TODO handle error
-                };
-            });
+            products.run();
         })
     };
-
-    {
-        let products = products.clone();
-        let refresh_products = refresh_products.clone();
-        use_effect(move || {
-            if products.is_none() {
-                refresh_products.emit(());
-            }
-
-            || {}
-        })
-    }
 
     html! {
         <>
             <Navbar />
             <main>
-                <div class="card products-card">
+                <div class={classes!("card", "products-card", class_if(products.loading, "card-loading"))}>
+                    <div class="loading-bar" />
+                    {
+                        products.error.as_ref().map_or_else(|| html!{}, |error| html! {
+                            <div class="card-error">{error}</div>
+                        })
+                    }
                     <div class="card-header">
                         {"Products"}
                     </div>
                     <div class="card-content">
                         <div class="product-list">
                             {
-                                if let Some(product_list) = &*products {
+                                if let Some(product_list) = &products.data {
                                     if product_list.is_empty() {
                                         html! {
                                             <p>{"There are no products in stock"}</p>
@@ -65,9 +57,7 @@ pub fn product_page() -> Html {
                                             .collect()
                                     }
                                 } else {
-                                    html! {
-                                        <p>{"Loading..."}</p>
-                                    }
+                                    html! { }
                                 }
                             }
                         </div>

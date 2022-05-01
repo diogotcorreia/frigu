@@ -49,11 +49,9 @@ pub fn login_page() -> Html {
             <div class={classes!("card", "login-card", class_if(state.loading, "card-loading"))}>
                 <div class="loading-bar" />
                 {
-                    if let Some(error) = error {
-                        html! { <div class="card-error">{error}</div> }
-                    } else {
-                        html! {}
-                    }
+                    error.map_or_else(|| html!{}, |error| html! {
+                        <div class="card-error">{error}</div>
+                    })
                 }
                 <div class="card-header">
                     {"Login to Frigu"}
