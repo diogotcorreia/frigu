@@ -20,7 +20,7 @@ pub(crate) async fn login(
     jar: CookieJar,
 ) -> Result<CookieJar, AppError> {
     let user = user::Entity::find()
-        .filter(user::Column::PhoneNumber.contains(&login_dto.phone))
+        .filter(user::Column::PhoneNumber.eq(login_dto.phone))
         .one(conn)
         .await?
         .ok_or(AppError::NoSuchUser)?;
@@ -80,6 +80,15 @@ pub(crate) async fn register(
     if password.len() < 8 {
         return Err(AppError::BadInput("password must be at least 8 characters"));
     }
+
+    let user = user::Entity::find()
+        .filter(user::Column::PhoneNumber.eq(phone_number.clone()))
+        .one(conn)
+        .await?;
+    if user.is_some() {
+        return Err(AppError::DuplicateUser);
+    }
+
     let salt = SaltString::generate(&mut OsRng);
     let password_hash = Argon2::default()
         .hash_password(password.as_bytes(), &salt)?
