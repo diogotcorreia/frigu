@@ -2,14 +2,13 @@ use argon2::password_hash::errors::Error as PwHashError;
 use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
-    Json,
 };
 use sea_orm::error::DbErr;
-use serde_json::json;
 
 pub(crate) enum AppError {
     BadInput(&'static str),
     NoSuchUser,
+    LoginError,
     DuplicateUser,
     NoSuchProduct,
     NoSuchPurchase,
@@ -39,7 +38,7 @@ impl IntoResponse for AppError {
                 StatusCode::CONFLICT,
                 "affected count is different than expected",
             ),
-            AppError::PwhError(PwHashError::Password) => {
+            AppError::PwhError(PwHashError::Password) | AppError::LoginError => {
                 (StatusCode::UNAUTHORIZED, "wrong password")
             }
             AppError::PwhError(_) | AppError::DbError(_) | AppError::JwtError(_) => {
@@ -51,11 +50,7 @@ impl IntoResponse for AppError {
             AppError::Forbidden => (StatusCode::FORBIDDEN, "not allowed to access this"),
         };
 
-        let body = Json(json!({
-            "error": error_message,
-        }));
-
-        (status, body).into_response()
+        (status, error_message).into_response()
     }
 }
 

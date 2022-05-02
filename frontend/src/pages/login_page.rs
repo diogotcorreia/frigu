@@ -1,44 +1,58 @@
-use wasm_bindgen_futures::spawn_local;
 use web_sys::HtmlInputElement;
 use yew::prelude::*;
+use yew_hooks::use_async;
 use yew_router::prelude::*;
 
-use crate::{api, Route};
+use crate::{
+    api::{self, ApiError},
+    utils::class_if,
+    Route,
+};
 
 #[function_component(LoginPage)]
 pub fn login_page() -> Html {
-    let history = use_history().unwrap();
+    let history = use_history().expect("yew-router must be accessible");
     let phone_ref = use_node_ref();
     let password_ref = use_node_ref();
-
-    let handle_submit = {
+    let state = {
         let phone_ref = phone_ref.clone();
         let password_ref = password_ref.clone();
-        Callback::from(move |event: FocusEvent| {
-            event.prevent_default();
+        use_async(async move {
+            let payload = &api::LoginPayload {
+                phone: phone_ref.cast::<HtmlInputElement>().unwrap().value(),
+                password: password_ref.cast::<HtmlInputElement>().unwrap().value(),
+            };
 
-            let history = history.clone();
-            let phone_ref = phone_ref.clone();
-            let password_ref = password_ref.clone();
-            spawn_local(async move {
-                match api::login(&api::LoginPayload {
-                    phone: phone_ref.cast::<HtmlInputElement>().unwrap().value(),
-                    password: password_ref.cast::<HtmlInputElement>().unwrap().value(),
-                })
-                .await
-                {
-                    Ok(()) => {
-                        history.push(Route::Home);
-                    }
-                    Err(_) => (/* TODO handle errors */),
-                };
-            })
+            api::login(payload).await
         })
     };
 
+    if state.data.is_some() {
+        history.push(Route::Home);
+    }
+
+    let handle_submit = {
+        let state = state.clone();
+        Callback::from(move |event: FocusEvent| {
+            event.prevent_default(); // avoid form submission
+            state.run();
+        })
+    };
+
+    let error = state.error.as_ref().map(|error| match error {
+        ApiError::HttpUnauthorized(_) => "Invalid phone number or password".to_string(),
+        error => format!("{}", error),
+    });
+
     html! {
         <main>
-            <div class="card login-card">
+            <div class={classes!("card", "login-card", class_if(state.loading, "card-loading"))}>
+                <div class="loading-bar" />
+                {
+                    error.map_or_else(|| html!{}, |error| html! {
+                        <div class="card-error">{error}</div>
+                    })
+                }
                 <div class="card-header">
                     {"Login to Frigu"}
                 </div>
@@ -50,7 +64,7 @@ pub fn login_page() -> Html {
                         <label for="login--password">{"Password"}</label>
                         <input ref={password_ref} type="password" id="login--password" />
 
-                        <button type="submit" class="btn btn--full-width">{"Login"}</button>
+                        <button type="submit" disabled={state.loading} class="btn btn--full-width btn--primary">{"Login"}</button>
                     </form>
                 </div>
             </div>

@@ -172,7 +172,6 @@ pub(crate) async fn pay_purchase_user_bulk(
         .exec(&txn)
         .await?;
 
-    dbg!(&result);
     if result.rows_affected != action_dto.count {
         return Err(AppError::BulkCountMismatch);
     }

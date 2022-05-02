@@ -30,7 +30,6 @@ enum Route {
 
 fn switch(routes: &Route) -> Html {
     match routes {
-        /* TODO redirect to login page if logged out */
         Route::Home => html! { <Redirect<Route> to={Route::ProductPage} /> },
         Route::Login => html! { <LoginPage /> },
         Route::ProductPage => html! { <ProductPage /> },

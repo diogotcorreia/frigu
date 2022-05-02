@@ -23,9 +23,9 @@ pub(crate) async fn login(
         .filter(user::Column::PhoneNumber.eq(login_dto.phone))
         .one(conn)
         .await?
-        .ok_or(AppError::NoSuchUser)?;
+        .ok_or(AppError::LoginError)?;
 
-    let password = dbg!(login_dto.password);
+    let password = login_dto.password;
 
     let hashed_password = user.hashed_password;
     let password_hash =
