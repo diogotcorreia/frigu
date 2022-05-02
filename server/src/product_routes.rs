@@ -9,7 +9,7 @@ use entity::{
 };
 use sea_orm::{prelude::*, DatabaseConnection, QueryOrder, Set, TransactionTrait};
 
-use crate::dtos::{ProductDto, PurchaseDto};
+use crate::{dtos::{ProductDto, PurchaseDto}, Config};
 use crate::errors::AppError;
 
 pub(crate) async fn list(
@@ -30,9 +30,10 @@ pub(crate) async fn list(
 pub(crate) async fn insert(
     extract::Json(product_dto): extract::Json<ProductDto>,
     Extension(ref conn): Extension<DatabaseConnection>,
+    Extension(ref config): Extension<Config>,
     jar: CookieJar,
 ) -> Result<Json<ProductDto>, AppError> {
-    let seller_id = crate::jwt_helpers::get_login(&jar)?;
+    let seller_id = crate::jwt_helpers::get_login(&jar, &config.hmac_secret)?;
     // validate stock
     let stock = product_dto.stock;
     if stock == 0 {
@@ -77,9 +78,10 @@ pub(crate) async fn purchase(
     Path(product_id): Path<u32>,
     Json(purchase_dto): Json<PurchaseDto>,
     Extension(ref conn): Extension<DatabaseConnection>,
+    Extension(ref config): Extension<Config>,
     jar: CookieJar,
 ) -> Result<(), AppError> {
-    let buyer_id = crate::jwt_helpers::get_login(&jar)?;
+    let buyer_id = crate::jwt_helpers::get_login(&jar, &config.hmac_secret)?;
 
     let txn = conn.begin().await?;
 

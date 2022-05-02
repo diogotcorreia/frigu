@@ -16,14 +16,15 @@ use sea_orm::{
     TransactionTrait, Unchanged,
 };
 
-use crate::dtos::{BuyerGroupedPurchasesDto, PayPurchaseUserBulkDto, PurchaseDto};
+use crate::{dtos::{BuyerGroupedPurchasesDto, PayPurchaseUserBulkDto, PurchaseDto}, Config};
 use crate::errors::AppError;
 
 pub(crate) async fn seller_summary(
     Extension(ref conn): Extension<DatabaseConnection>,
+    Extension(ref config): Extension<Config>,
     jar: CookieJar,
 ) -> Result<Json<Vec<BuyerGroupedPurchasesDto>>, AppError> {
-    let seller_id = crate::jwt_helpers::get_login(&jar)?;
+    let seller_id = crate::jwt_helpers::get_login(&jar, &config.hmac_secret)?;
 
     // Sold products
     let entities = Purchase::find()
@@ -78,9 +79,10 @@ pub(crate) async fn seller_summary(
 
 pub(crate) async fn purchase_history(
     Extension(ref conn): Extension<DatabaseConnection>,
+    Extension(ref config): Extension<Config>,
     jar: CookieJar,
 ) -> Result<Json<Vec<PurchaseDto>>, AppError> {
-    let buyer_id = crate::jwt_helpers::get_login(&jar)?;
+    let buyer_id = crate::jwt_helpers::get_login(&jar, &config.hmac_secret)?;
 
     let entities = Purchase::find()
         .join(JoinType::InnerJoin, purchase::Relation::User.def())
@@ -106,9 +108,10 @@ struct PurchaseWithSeller {
 pub(crate) async fn pay_purchase(
     Path(purchase_id): Path<u32>,
     Extension(ref conn): Extension<DatabaseConnection>,
+    Extension(ref config): Extension<Config>,
     jar: CookieJar,
 ) -> Result<(), AppError> {
-    let seller_id = crate::jwt_helpers::get_login(&jar)?;
+    let seller_id = crate::jwt_helpers::get_login(&jar, &config.hmac_secret)?;
 
     let txn = conn.begin().await?;
 
@@ -144,9 +147,10 @@ pub(crate) async fn pay_purchase_user_bulk(
     Path(buyer_id): Path<u32>,
     extract::Json(action_dto): extract::Json<PayPurchaseUserBulkDto>,
     Extension(ref conn): Extension<DatabaseConnection>,
+    Extension(ref config): Extension<Config>,
     jar: CookieJar,
 ) -> Result<(), AppError> {
-    let seller_id = crate::jwt_helpers::get_login(&jar)?;
+    let seller_id = crate::jwt_helpers::get_login(&jar, &config.hmac_secret)?;
 
     let txn = conn.begin().await?;
 
