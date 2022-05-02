@@ -60,8 +60,9 @@ pub(crate) async fn register(
     extract::Json(register_dto): extract::Json<RegisterDto>,
     ClientIp(ip): ClientIp,
     Extension(ref conn): Extension<DatabaseConnection>,
+    Extension(ref config): Extension<Config>,
 ) -> Result<Json<UserDto>, AppError> {
-    if !ip.is_loopback() {
+    if !config.admin_subnet.contains(ip) {
         return Err(AppError::Forbidden);
     }
 

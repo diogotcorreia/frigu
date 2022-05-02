@@ -16,6 +16,7 @@ use tower::{ServiceBuilder, ServiceExt};
 use tower_http::add_extension::AddExtensionLayer;
 use tower_http::services::ServeDir;
 use tower_http::trace::TraceLayer;
+use ipnetwork::IpNetwork;
 
 mod dtos;
 mod errors;
@@ -48,6 +49,7 @@ struct Opt {
 #[derive(Debug, Clone)]
 struct Config {
     hmac_secret: Box<[u8]>,
+    admin_subnet: IpNetwork,
 }
 
 #[tokio::main]
@@ -64,8 +66,16 @@ async fn main() {
     dotenv::dotenv().ok();
     let db_url = env::var("DATABASE_URL").expect("DATABASE_URL is not set in .env file");
 
+    let hmac_secret = env::var("HMAC_SECRET").expect("HMAC_SECRET is not set").into_bytes().into();
+
+    let admin_subnet: IpNetwork = {
+        let admin_subnet_string = env::var("ADMIN_SUBNET").expect("ADMIN_SUBNET is not set");
+        admin_subnet_string.as_str().try_into().expect("ADMIN_SUBNET was not valid")
+    };
+
     let config = Config {
-        hmac_secret: env::var("HMAC_SECRET").expect("HMAC_SECRET is not set").into_bytes().into(),
+        hmac_secret,
+        admin_subnet,
     };
 
     let conn = Database::connect(db_url)
