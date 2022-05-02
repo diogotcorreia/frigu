@@ -50,6 +50,7 @@ services:
     environment:
       - DATABASE_URL=mysql://frigu:frigu@db/frigu
       - HMAC_SECRET=some-secret
+      - ADMIN_SUBNET=127.0.0.1/32
     depends_on:
       - db
   db:
