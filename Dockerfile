@@ -5,7 +5,7 @@ RUN cargo install trunk
 
 WORKDIR /app/frontend
 COPY ./frontend .
-RUN trunk build
+RUN trunk build --release
 
 
 FROM ekidd/rust-musl-builder as backend-compiler
