@@ -11,7 +11,8 @@ use entity::user;
 
 use crate::{
     dtos::{LoginDto, RegisterDto, UserDto},
-    errors::AppError, Config,
+    errors::AppError,
+    Config,
 };
 
 pub(crate) async fn login(
