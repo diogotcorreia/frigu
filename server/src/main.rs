@@ -45,6 +45,11 @@ struct Opt {
     static_dir: String,
 }
 
+#[derive(Debug, Clone)]
+struct Config {
+    hmac_secret: Box<[u8]>,
+}
+
 #[tokio::main]
 async fn main() {
     let opt = Opt::parse();
@@ -58,6 +63,10 @@ async fn main() {
 
     dotenv::dotenv().ok();
     let db_url = env::var("DATABASE_URL").expect("DATABASE_URL is not set in .env file");
+
+    let config = Config {
+        hmac_secret: env::var("HMAC_SECRET").expect("HMAC_SECRET is not set").into_bytes().into(),
+    };
 
     let conn = Database::connect(db_url)
         .await
@@ -116,6 +125,7 @@ async fn main() {
         .layer(
             ServiceBuilder::new()
                 .layer(AddExtensionLayer::new(conn))
+                .layer(AddExtensionLayer::new(config))
                 .layer(TraceLayer::new_for_http()),
         );
 

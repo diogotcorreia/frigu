@@ -11,12 +11,13 @@ use entity::user;
 
 use crate::{
     dtos::{LoginDto, RegisterDto, UserDto},
-    errors::AppError,
+    errors::AppError, Config,
 };
 
 pub(crate) async fn login(
     extract::Json(login_dto): extract::Json<LoginDto>,
     Extension(ref conn): Extension<DatabaseConnection>,
+    Extension(ref config): Extension<Config>,
     jar: CookieJar,
 ) -> Result<CookieJar, AppError> {
     let user = user::Entity::find()
@@ -32,15 +33,16 @@ pub(crate) async fn login(
         PasswordHash::new(&hashed_password).expect("saved password hash must be valid");
     Argon2::default().verify_password(password.as_bytes(), &password_hash)?;
 
-    let user_cookie = crate::jwt_helpers::new_cookie(user.id)?;
+    let user_cookie = crate::jwt_helpers::new_cookie(user.id, &config.hmac_secret)?;
     Ok(jar.add(user_cookie))
 }
 
 pub(crate) async fn user_info(
     Extension(ref conn): Extension<DatabaseConnection>,
+    Extension(ref config): Extension<Config>,
     jar: CookieJar,
 ) -> Result<Json<UserDto>, AppError> {
-    let user_id = crate::jwt_helpers::get_login(&jar)?;
+    let user_id = crate::jwt_helpers::get_login(&jar, &config.hmac_secret)?;
 
     let user = user::Entity::find_by_id(user_id)
         .one(conn)
