@@ -16,10 +16,10 @@ services:
     image: mariadb
     restart: unless-stopped
     environment:
-      MARIADB_RANDOM_ROOT_PASSWORD: yes
-      MARIADB_USER: frigu
-      MARIADB_PASSWORD: frigu
-      MARIADB_DATABASE: frigu
+      - MARIADB_RANDOM_ROOT_PASSWORD=true
+      - MARIADB_USER=frigu
+      - MARIADB_PASSWORD=frigu
+      - MARIADB_DATABASE=frigu
     volumes:
       - frigu-data:/var/lib/mysql
 
