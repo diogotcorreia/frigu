@@ -4,4 +4,3 @@ docker-mysql/
 dev.sh
 
 **/target/
-**/Cargo.lock

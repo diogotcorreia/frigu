@@ -2,7 +2,7 @@ version: '3'
 
 services:
   frigu:
-    image: ghcr.io/diogotcorreia/frigu:0
+    build: .
     restart: unless-stopped
     ports:
       - 127.0.0.1:8080:8080
