@@ -771,7 +771,7 @@ checksum = "e78d4f1cc4ae33bbfc157ed5d5a5ef3bc29227303d595861deb238fcec4e9457"
 
 [[package]]
 name = "entity"
-version = "0.2.2"
+version = "0.2.3"
 dependencies = [
  "sea-orm",
 ]
@@ -1295,7 +1295,7 @@ checksum = "2dffe52ecf27772e601905b7522cb4ef790d2cc203488bbd0e2fe85fcb74566d"
 
 [[package]]
 name = "migration"
-version = "0.2.2"
+version = "0.2.3"
 dependencies = [
  "entity",
  "sea-orm-migration",
@@ -2150,7 +2150,7 @@ dependencies = [
 
 [[package]]
 name = "server"
-version = "0.2.2"
+version = "0.2.3"
 dependencies = [
  "argon2",
  "axum",

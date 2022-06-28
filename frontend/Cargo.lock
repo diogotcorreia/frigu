@@ -70,7 +70,7 @@ dependencies = [
 
 [[package]]
 name = "frontend"
-version = "0.2.2"
+version = "0.2.3"
 dependencies = [
  "chrono",
  "console_error_panic_hook",
