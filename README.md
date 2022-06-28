@@ -36,4 +36,4 @@ curl -X POST 'http://localhost:8080/api/register' \
 
 A pre-built docker image is available at `ghcr.io/diogotcorreia/frigu`.
 
-A sample `docker-compose.yml` for this project is available at [github.com/diogotcorreia/frigu](https://github.com/diogotcorreia/frigu)
+A sample `docker-compose.yml` for this project is available [in this repository](./docker-compose.yml).
