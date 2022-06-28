@@ -36,34 +36,4 @@ curl -X POST 'http://localhost:8080/api/register' \
 
 A pre-built docker image is available at `ghcr.io/diogotcorreia/frigu`.
 
-Here is a sample `docker-compose.yml`:
-
-```yml
-version: "3"
-
-services:
-  frigu:
-    image: ghcr.io/diogotcorreia/frigu:0
-    restart: unless-stopped
-    ports:
-      - 127.0.0.1:8080:8080
-    environment:
-      - DATABASE_URL=mysql://frigu:frigu@db/frigu
-      - HMAC_SECRET=some-secret
-      - ADMIN_SUBNET=127.0.0.1/32
-    depends_on:
-      - db
-  db:
-    image: mariadb
-    restart: unless-stopped
-    environment:
-      MARIADB_RANDOM_ROOT_PASSWORD: yes
-      MARIADB_USER: frigu
-      MARIADB_PASSWORD: frigu
-      MARIADB_DATABASE: frigu
-    volumes:
-      - frigu-data:/var/lib/mysql
-
-volumes:
-  frigu-data:
-```
+A sample `docker-compose.yml` for this project is available [in this repository](./docker-compose.yml).
