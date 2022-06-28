@@ -16,7 +16,7 @@ struct Claim {
 pub(crate) fn new_cookie(sub: u32, hmac_secret: &[u8]) -> Result<Cookie<'static>, AppError> {
     let key: Hmac<Sha256> =
         Hmac::new_from_slice(hmac_secret).expect("HMAC can take key of any size");
-    let exp = (chrono::offset::Utc::now() + chrono::Duration::hours(24)).timestamp();
+    let exp = (chrono::offset::Utc::now() + chrono::Duration::days(7)).timestamp();
     let claim = Claim { sub, exp };
     let token_str = claim.sign_with_key(&key)?;
     Ok(Cookie::new("jwt", token_str).into_owned())
